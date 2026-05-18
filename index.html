@@ -220,6 +220,9 @@ input[type="file"] { display:none; }
   opacity:0; transition:opacity .2s; z-index:100; pointer-events:none; max-width:90vw;
 }
 .toast.show { opacity:1; }
+.modal { display:none; position:fixed; inset:0; background:rgba(26,26,26,0.55); z-index:200; padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+.modal.active { display:flex; align-items:flex-end; justify-content:center; animation:fade .15s ease; }
+.modal-card { background:var(--paper); padding:20px 16px 24px; border-radius:var(--radius) var(--radius) 0 0; width:100%; max-width:480px; border-top:3px solid var(--accent); }
 .muted { color:var(--muted); }
 .small { font-size:12px; }
 .spacer { height:24px; }
@@ -289,10 +292,31 @@ hr.rule { border:none; border-top:1.5px solid var(--ink); margin:24px 0 12px; }
     </div>
     <p class="subtitle" id="session-date"></p>
     <div id="exercise-list"></div>
+    <button class="add-set" id="btn-add-ex" style="min-height:52px;font-size:14px;margin-top:4px;">+ Add Off-Plan Exercise</button>
     <hr class="rule" />
     <button class="btn accent" id="btn-finish">Finish & Export Session</button>
     <button class="btn ghost" id="btn-abandon">Abandon Session</button>
   </section>
+
+  <div class="modal" id="add-ex-modal">
+    <div class="modal-card">
+      <div class="label">Add exercise to this session</div>
+      <input list="ex-datalist" id="add-ex-name" placeholder="Exercise (type or pick)"
+        style="width:100%;padding:14px 12px;font-size:16px;border:1.5px solid var(--ink);border-radius:var(--radius);margin:10px 0;" />
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+        <label class="small muted">Sets
+          <input type="number" id="add-ex-sets" value="3" min="1" max="20"
+            style="width:100%;padding:10px;font-size:16px;border:1.5px solid var(--ink);border-radius:var(--radius);margin-top:4px;font-family:var(--font-mono);font-weight:700;" />
+        </label>
+        <label class="small muted">Rest (sec)
+          <input type="number" id="add-ex-rest" value="90" min="0" step="15"
+            style="width:100%;padding:10px;font-size:16px;border:1.5px solid var(--ink);border-radius:var(--radius);margin-top:4px;font-family:var(--font-mono);font-weight:700;" />
+        </label>
+      </div>
+      <button class="btn accent" id="btn-confirm-add-ex">Add to Session</button>
+      <button class="btn ghost" id="btn-cancel-add-ex">Cancel</button>
+    </div>
+  </div>
 
   <section class="view pad-bot" id="view-quick-log">
     <h1 class="page-title">Quick <em>Log</em></h1>
@@ -782,6 +806,48 @@ $("#btn-abandon").addEventListener("click", () => {
   if (!confirm("Abandon this session? Logged sets stay in your local history.")) return;
   state.activeSession = null; kvSet("activeSession", null);
   stopRestTimer(); renderHomeActiveBanner(); showView("home");
+});
+$("#btn-add-ex").addEventListener("click", () => {
+  if (!state.activeSession) return;
+  $("#add-ex-name").value = "";
+  $("#add-ex-sets").value = "3";
+  $("#add-ex-rest").value = "90";
+  $("#add-ex-modal").classList.add("active");
+  setTimeout(() => $("#add-ex-name").focus(), 50);
+});
+$("#btn-cancel-add-ex").addEventListener("click", () => {
+  $("#add-ex-modal").classList.remove("active");
+});
+$("#add-ex-modal").addEventListener("click", (e) => {
+  if (e.target.id === "add-ex-modal") $("#add-ex-modal").classList.remove("active");
+});
+$("#btn-confirm-add-ex").addEventListener("click", () => {
+  const name = $("#add-ex-name").value.trim();
+  if (!name) { toast("Type an exercise name"); return; }
+  const sets = Math.max(1, parseInt($("#add-ex-sets").value, 10) || 3);
+  const rest = Math.max(0, parseInt($("#add-ex-rest").value, 10) || 0);
+  // Collapse all open exercises so the new one is the focal point
+  state.activeSession.exercises.forEach(ex => ex.open = false);
+  state.activeSession.exercises.push({
+    order: 999,
+    exercise: name,
+    targetSets: String(sets),
+    targetReps: "",
+    targetWeight: "",
+    restSec: rest,
+    notes: "Added mid-session",
+    sets: Array.from({length: sets}, () => ({reps:"",weight:"",rpe:"",done:false})),
+    open: true,
+  });
+  $("#add-ex-modal").classList.remove("active");
+  renderSession();
+  persistSession();
+  toast(`Added ${name}`);
+  setTimeout(() => {
+    const list = $("#exercise-list");
+    const cards = list.querySelectorAll(".ex");
+    if (cards.length) cards[cards.length - 1].scrollIntoView({behavior: "smooth", block: "center"});
+  }, 100);
 });
 $("#ql-add").addEventListener("click", () => {
   state._ql.sets.push({reps:"",weight:"",rpe:"",done:false}); renderQuickLog();
