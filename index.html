@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#C2410C" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Workout" />
+<title>Workout</title>
+<link rel="manifest" href="./manifest.webmanifest" />
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --paper:#F5F1E8; --paper-2:#ECE6D6; --ink:#1A1A1A; --ink-soft:#3A3A3A;
+  --muted:#8A8580; --line:#D8CFBA; --accent:#C2410C; --accent-soft:#FFE8D6;
+  --success:#1F7A4F; --danger:#991B1B; --shadow:rgba(26,26,26,0.08);
+  --font-display:"Anton","Impact",system-ui,sans-serif;
+  --font-body:"Manrope",system-ui,-apple-system,sans-serif;
+  --font-mono:"JetBrains Mono","SF Mono",Menlo,monospace;
+  --radius:4px; --tap:56px;
+}
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body { margin:0; padding:0; background:var(--paper); color:var(--ink); }
+body {
+  font-family:var(--font-body); font-size:16px; line-height:1.4;
+  min-height:100vh; min-height:100dvh;
+  padding-bottom:env(safe-area-inset-bottom); padding-top:env(safe-area-inset-top);
+  overscroll-behavior-y:contain;
+}
+button { font-family:inherit; font-size:inherit; color:inherit; background:none; border:none; padding:0; cursor:pointer; }
+input,select,textarea { font-family:inherit; font-size:inherit; color:var(--ink); }
+.app { max-width:480px; margin:0 auto; padding:0 16px; }
+header.bar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px 0 14px; border-bottom:1.5px solid var(--ink); margin-bottom:18px;
+}
+header.bar .brand {
+  font-family:var(--font-display); font-size:28px; letter-spacing:0.08em;
+  display:flex; align-items:center; gap:10px;
+}
+header.bar .brand::before {
+  content:""; display:inline-block; width:14px; height:14px;
+  background:var(--accent); transform:rotate(45deg);
+}
+header.bar nav { display:flex; gap:4px; }
+header.bar nav button {
+  font-size:12px; letter-spacing:0.12em; text-transform:uppercase;
+  padding:8px 10px; color:var(--muted); font-weight:700;
+}
+header.bar nav button.active { color:var(--accent); }
+.view { display:none; }
+.view.active { display:block; animation:fade .2s ease; }
+@keyframes fade { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
+h1.page-title {
+  font-family:var(--font-display); font-size:44px; line-height:0.95;
+  letter-spacing:0.02em; margin:8px 0 4px;
+}
+h1.page-title em { font-style:normal; color:var(--accent); }
+.subtitle { color:var(--muted); font-size:14px; margin:0 0 24px; }
+.card {
+  background:#FCFAF2; border:1.5px solid var(--ink); border-radius:var(--radius);
+  padding:16px; margin-bottom:14px; position:relative;
+}
+.card .label {
+  font-size:11px; letter-spacing:0.18em; text-transform:uppercase;
+  color:var(--muted); font-weight:700; margin-bottom:6px;
+}
+.card .big { font-family:var(--font-display); font-size:36px; line-height:1; letter-spacing:0.02em; }
+.card.accent { background:var(--accent-soft); border-color:var(--accent); }
+.card.accent .big { color:var(--accent); }
+.tape {
+  position:absolute; top:-10px; right:12px;
+  font-family:var(--font-mono); font-size:10px; letter-spacing:0.1em;
+  background:var(--ink); color:var(--paper); padding:4px 10px;
+}
+.btn {
+  display:inline-flex; align-items:center; justify-content:center;
+  min-height:var(--tap); padding:0 20px;
+  background:var(--ink); color:var(--paper);
+  border:none; border-radius:var(--radius);
+  font-family:var(--font-display); font-size:18px;
+  letter-spacing:0.08em; text-transform:uppercase;
+  width:100%; font-weight:700; transition:transform .08s ease;
+}
+.btn:active { transform:scale(0.985); }
+.btn.accent { background:var(--accent); color:white; }
+.btn.outline { background:transparent; color:var(--ink); border:1.5px solid var(--ink); }
+.btn.ghost { background:transparent; color:var(--muted); font-size:13px; min-height:44px; text-transform:uppercase; letter-spacing:0.12em; }
+.btn + .btn { margin-top:10px; }
+.select-list { display:flex; flex-direction:column; gap:10px; margin-bottom:16px; }
+.select-list button.option {
+  display:flex; align-items:center; justify-content:space-between;
+  min-height:var(--tap); padding:12px 16px;
+  background:#FCFAF2; border:1.5px solid var(--line);
+  border-radius:var(--radius); color:var(--ink);
+  font-weight:600; text-align:left; width:100%; font-size:16px;
+}
+.select-list button.option:active { background:var(--paper-2); }
+.select-list button.option .meta {
+  font-size:12px; color:var(--muted); font-weight:500;
+  margin-left:12px; font-family:var(--font-mono);
+}
+.ex { background:#FCFAF2; border:1.5px solid var(--ink); border-radius:var(--radius); margin-bottom:12px; overflow:hidden; }
+.ex-head {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 16px; min-height:var(--tap);
+  background:var(--ink); color:var(--paper); cursor:pointer;
+}
+.ex-head .name {
+  font-family:var(--font-display); font-size:22px; letter-spacing:0.04em;
+  flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.ex-head .meta {
+  font-family:var(--font-mono); font-size:12px;
+  color:var(--paper-2); opacity:0.85; margin-left:8px; white-space:nowrap;
+}
+.ex-head .check { font-family:var(--font-mono); font-size:14px; margin-left:10px; color:var(--accent); }
+.ex-body { padding:14px 16px; display:none; }
+.ex.open .ex-body { display:block; }
+.ex .target { font-family:var(--font-mono); font-size:12px; color:var(--muted); margin-bottom:4px; }
+.ex .last {
+  font-family:var(--font-mono); font-size:12px; color:var(--ink-soft);
+  margin-bottom:12px; padding:6px 8px;
+  background:var(--paper-2); border-radius:2px; display:inline-block;
+}
+.ex .notes { font-size:12px; color:var(--muted); font-style:italic; margin-bottom:12px; }
+.set-row {
+  display:grid; grid-template-columns:28px 1fr 1fr 50px 56px;
+  gap:6px; align-items:center; padding:6px 0;
+  border-top:1px dashed var(--line);
+}
+.set-row:first-of-type { border-top:0; }
+.set-row.done { opacity:0.55; }
+.set-row .set-num { font-family:var(--font-mono); font-weight:700; font-size:14px; text-align:center; color:var(--muted); }
+.set-row .stepper {
+  display:flex; align-items:stretch;
+  border:1.5px solid var(--ink); border-radius:var(--radius);
+  background:white; overflow:hidden; height:48px;
+}
+.set-row .stepper button {
+  width:32px; font-family:var(--font-mono); font-size:18px; font-weight:700;
+  color:var(--ink); background:var(--paper-2);
+}
+.set-row .stepper button:active { background:var(--accent-soft); }
+.set-row .stepper input {
+  flex:1; width:100%; min-width:0; border:none; text-align:center;
+  font-family:var(--font-mono); font-size:17px; font-weight:700;
+  padding:0; background:transparent;
+}
+.set-row .stepper input:focus { outline:none; background:var(--accent-soft); }
+.set-row .rpe {
+  height:48px; padding:0 4px; border:1.5px solid var(--ink);
+  border-radius:var(--radius); background:white;
+  font-family:var(--font-mono); font-size:14px; font-weight:700;
+  text-align:center; -webkit-appearance:none; appearance:none;
+}
+.set-row .check-btn {
+  height:48px; border:1.5px solid var(--ink); border-radius:var(--radius);
+  background:white; font-family:var(--font-display); font-size:22px;
+  letter-spacing:0.04em; color:var(--muted);
+}
+.set-row.done .check-btn { background:var(--success); color:white; border-color:var(--success); }
+.set-headers {
+  display:grid; grid-template-columns:28px 1fr 1fr 50px 56px;
+  gap:6px; padding-bottom:6px; font-family:var(--font-mono);
+  font-size:10px; letter-spacing:0.1em; text-transform:uppercase;
+  color:var(--muted);
+}
+.set-headers span { text-align:center; }
+.add-set {
+  width:100%; min-height:40px; margin-top:8px;
+  border:1.5px dashed var(--line); border-radius:var(--radius);
+  color:var(--muted); font-size:13px; font-weight:700;
+  letter-spacing:0.08em; text-transform:uppercase;
+}
+.add-set:active { background:var(--paper-2); }
+.rest-timer {
+  position:fixed; left:0; right:0; bottom:env(safe-area-inset-bottom,0);
+  background:var(--ink); color:var(--paper); padding:14px 20px 18px;
+  display:none; z-index:50; border-top:3px solid var(--accent);
+  box-shadow:0 -10px 30px var(--shadow);
+}
+.rest-timer.active { display:flex; align-items:center; gap:14px; }
+.rest-timer .label { font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); }
+.rest-timer .countdown {
+  font-family:var(--font-mono); font-size:38px; font-weight:700;
+  color:var(--accent); line-height:1; font-variant-numeric:tabular-nums;
+}
+.rest-timer .info { flex:1; }
+.rest-timer button {
+  min-height:44px; padding:0 16px; background:var(--accent); color:white;
+  font-family:var(--font-display); font-size:14px; letter-spacing:0.08em;
+  border-radius:var(--radius);
+}
+.kbd {
+  display:inline-block; font-family:var(--font-mono); font-size:11px;
+  padding:2px 6px; background:var(--paper-2); border:1px solid var(--line);
+  border-radius:2px;
+}
+input[type="file"] { display:none; }
+.file-pick {
+  display:inline-flex; align-items:center; justify-content:center;
+  min-height:var(--tap); padding:0 20px; background:transparent;
+  color:var(--ink); border:1.5px solid var(--ink); border-radius:var(--radius);
+  font-family:var(--font-display); font-size:18px;
+  letter-spacing:0.08em; text-transform:uppercase; width:100%;
+  cursor:pointer; font-weight:700;
+}
+.log-day { background:#FCFAF2; border:1.5px solid var(--line); border-radius:var(--radius); padding:12px 14px; margin-bottom:10px; }
+.log-day h3 { font-family:var(--font-display); font-size:18px; margin:0 0 6px; letter-spacing:0.04em; }
+.log-day .sets { font-family:var(--font-mono); font-size:12px; color:var(--ink-soft); line-height:1.7; }
+.toast {
+  position:fixed; bottom:100px; left:50%; transform:translateX(-50%);
+  background:var(--ink); color:var(--paper); padding:10px 16px;
+  border-radius:var(--radius); font-size:14px; font-weight:600;
+  opacity:0; transition:opacity .2s; z-index:100; pointer-events:none; max-width:90vw;
+}
+.toast.show { opacity:1; }
+.muted { color:var(--muted); }
+.small { font-size:12px; }
+.spacer { height:24px; }
+.pad-bot { padding-bottom:120px; }
+.split { display:flex; justify-content:space-between; align-items:baseline; }
+hr.rule { border:none; border-top:1.5px solid var(--ink); margin:24px 0 12px; }
+@media (max-width:360px) {
+  .set-row,.set-headers { grid-template-columns:24px 1fr 1fr 44px 48px; gap:4px; }
+  h1.page-title { font-size:36px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="bar">
+    <div class="brand">WORKOUT</div>
+    <nav>
+      <button data-view="home" class="active">Home</button>
+      <button data-view="history">Log</button>
+      <button data-view="settings">≡</button>
+    </nav>
+  </header>
+
+  <section class="view active" id="view-home">
+    <h1 class="page-title">Today's <em>Session</em></h1>
+    <p class="subtitle" id="home-greeting">Pick a plan to load today's prescribed work.</p>
+
+    <div class="card accent" id="active-banner" style="display:none">
+      <span class="tape">IN PROGRESS</span>
+      <div class="label">Active session</div>
+      <div class="big" id="active-banner-name">—</div>
+      <div class="small" id="active-banner-stats">— sets logged</div>
+      <div class="spacer" style="height:14px"></div>
+      <button class="btn accent" id="btn-resume">Resume</button>
+    </div>
+
+    <div class="card" id="snapshot-card">
+      <span class="tape" id="snapshot-tape">NO DATA</span>
+      <div class="label">Snapshot</div>
+      <div class="big" id="snapshot-summary">—</div>
+      <div class="small muted" id="snapshot-meta">Import a snapshot.json from your Python sync tool.</div>
+    </div>
+
+    <button class="btn accent" id="btn-new-session">Start New Session</button>
+    <button class="btn outline" id="btn-quick-log">Quick-log Single Set</button>
+  </section>
+
+  <section class="view" id="view-pick-plan">
+    <h1 class="page-title">Pick a <em>Plan</em></h1>
+    <p class="subtitle">Choose which plan you're following today.</p>
+    <div class="select-list" id="plan-list"></div>
+    <button class="btn outline" data-view="home">Back</button>
+  </section>
+
+  <section class="view" id="view-pick-day">
+    <h1 class="page-title">Pick a <em>Day</em></h1>
+    <p class="subtitle" id="pick-day-sub">—</p>
+    <div class="select-list" id="day-list"></div>
+    <button class="btn outline" data-view="pick-plan">Back</button>
+  </section>
+
+  <section class="view pad-bot" id="view-session">
+    <div class="split">
+      <h1 class="page-title" style="font-size:32px" id="session-title">Session</h1>
+      <span class="small muted" id="session-meta">—</span>
+    </div>
+    <p class="subtitle" id="session-date"></p>
+    <div id="exercise-list"></div>
+    <hr class="rule" />
+    <button class="btn accent" id="btn-finish">Finish & Export Session</button>
+    <button class="btn ghost" id="btn-abandon">Abandon Session</button>
+  </section>
+
+  <section class="view pad-bot" id="view-quick-log">
+    <h1 class="page-title">Quick <em>Log</em></h1>
+    <p class="subtitle">Off-plan set or a one-off lift.</p>
+    <div class="card">
+      <div class="label">Exercise</div>
+      <input list="ex-datalist" id="ql-exercise" placeholder="Type or pick…"
+        style="width:100%;padding:14px 12px;font-size:16px;border:1.5px solid var(--ink);border-radius:var(--radius);margin-top:6px;" />
+      <datalist id="ex-datalist"></datalist>
+    </div>
+    <div class="set-headers"><span></span><span>Reps</span><span>Weight</span><span>RPE</span><span></span></div>
+    <div id="ql-sets"></div>
+    <button class="add-set" id="ql-add">+ Add set</button>
+    <hr class="rule" />
+    <button class="btn accent" id="ql-save">Save to History</button>
+    <button class="btn outline" data-view="home">Cancel</button>
+  </section>
+
+  <section class="view" id="view-history">
+    <h1 class="page-title">Training <em>Log</em></h1>
+    <p class="subtitle" id="history-count">—</p>
+    <div id="history-list"></div>
+    <button class="btn outline" data-view="home">Back</button>
+  </section>
+
+  <section class="view" id="view-settings">
+    <h1 class="page-title">Settings &amp; <em>Sync</em></h1>
+    <div class="card">
+      <div class="label">Snapshot</div>
+      <p class="small">Import the <span class="kbd">snapshot.json</span> from your desktop sync tool to load plans, exercise library, and recent log.</p>
+      <label class="file-pick">Import snapshot.json
+        <input type="file" id="snapshot-file" accept=".json,application/json" />
+      </label>
+      <div class="spacer" style="height:12px"></div>
+      <div class="small muted" id="snapshot-detail">No snapshot loaded.</div>
+    </div>
+    <div class="card">
+      <div class="label">Export logged sets</div>
+      <p class="small">Generates a CSV of every set you've logged in this PWA. Save it to your OneDrive <span class="kbd">pwa_inbox/</span> folder. Your desktop sync tool will pull it into the workbook.</p>
+      <button class="btn outline" id="btn-export-all">Export all sets → CSV</button>
+      <div class="spacer" style="height:8px"></div>
+      <button class="btn ghost" id="btn-export-unsynced">Export only un-synced</button>
+      <div class="small muted" id="export-detail">— sets stored locally.</div>
+    </div>
+    <div class="card">
+      <div class="label">Local data</div>
+      <p class="small">All sets live in your phone's browser storage (IndexedDB). Survives reloads, cleared if you uninstall the PWA.</p>
+      <button class="btn ghost" id="btn-mark-synced">Mark all as synced</button>
+      <button class="btn ghost" id="btn-clear-data" style="color:var(--danger)">Erase all local data</button>
+    </div>
+    <div class="card">
+      <div class="label">About</div>
+      <p class="small">Workout PWA · v1.0 · offline-capable</p>
+      <p class="small muted">Built to pair with the Python analyzer + xlsx workbook. No accounts, no servers, no tracking.</p>
+    </div>
+    <button class="btn outline" data-view="home">Back</button>
+  </section>
+
+</div>
+
+<div class="rest-timer" id="rest-timer">
+  <div class="info">
+    <div class="label">Rest</div>
+    <div class="countdown" id="rest-countdown">0:00</div>
+  </div>
+  <button id="rest-skip">Skip</button>
+</div>
+
+<div class="toast" id="toast">—</div>
+
+<script>
+const $ = (s, c=document) => c.querySelector(s);
+const $$ = (s, c=document) => [...c.querySelectorAll(s)];
+const el = (tag, attrs={}, ...children) => {
+  const n = document.createElement(tag);
+  for (const k in attrs) {
+    if (k === "class") n.className = attrs[k];
+    else if (k.startsWith("on")) n.addEventListener(k.slice(2), attrs[k]);
+    else if (k === "html") n.innerHTML = attrs[k];
+    else n.setAttribute(k, attrs[k]);
+  }
+  for (const c of children) {
+    if (c == null) continue;
+    n.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+  }
+  return n;
+};
+const toast = (msg) => {
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 1800);
+};
+
+const DB_NAME = "workout-tracker", DB_VERSION = 1;
+let _db;
+function openDB() {
+  if (_db) return Promise.resolve(_db);
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains("sets")) {
+        const s = db.createObjectStore("sets", { keyPath: "id", autoIncrement: true });
+        s.createIndex("date", "date");
+        s.createIndex("synced", "synced");
+      }
+      if (!db.objectStoreNames.contains("kv")) db.createObjectStore("kv");
+    };
+    req.onsuccess = () => { _db = req.result; resolve(_db); };
+    req.onerror = () => reject(req.error);
+  });
+}
+const tx = (store, mode="readonly") =>
+  openDB().then(db => db.transaction(store, mode).objectStore(store));
+const idbReq = (req) => new Promise((res, rej) => {
+  req.onsuccess = () => res(req.result); req.onerror = () => rej(req.error);
+});
+const kvGet = (k) => tx("kv").then(s => idbReq(s.get(k)));
+const kvSet = (k, v) => tx("kv","readwrite").then(s => idbReq(s.put(v, k)));
+const setsAdd = (s) => tx("sets","readwrite").then(st => idbReq(st.add(s)));
+const setsAll = () => tx("sets").then(s => idbReq(s.getAll()));
+const setsClear = () => tx("sets","readwrite").then(s => idbReq(s.clear()));
+
+const state = { snapshot: null, activeSession: null, view: "home", rest: null, _ql: null };
+
+function showView(name) {
+  $$(".view").forEach(v => v.classList.remove("active"));
+  $(`#view-${name}`).classList.add("active");
+  $$("header nav button").forEach(b => b.classList.toggle("active", b.dataset.view === name));
+  state.view = name;
+  window.scrollTo(0, 0);
+  if (name === "history") renderHistory();
+  if (name === "settings") refreshSettingsCounts();
+  if (name === "quick-log") { if (!state._ql) state._ql = { sets: [{reps:"",weight:"",rpe:"",done:false}] }; renderQuickLog(); }
+}
+
+async function loadSnapshot() {
+  state.snapshot = await kvGet("snapshot") || null;
+  renderSnapshotStatus();
+  const dl = $("#ex-datalist"); dl.innerHTML = "";
+  if (state.snapshot?.library) {
+    for (const ex of state.snapshot.library) dl.appendChild(el("option", { value: ex.name }));
+  }
+}
+function renderSnapshotStatus() {
+  if (!state.snapshot) {
+    $("#snapshot-tape").textContent = "NO DATA";
+    $("#snapshot-summary").textContent = "—";
+    $("#snapshot-meta").textContent = "Open Settings to import a snapshot.json.";
+    $("#snapshot-detail").textContent = "No snapshot loaded.";
+    return;
+  }
+  const s = state.snapshot;
+  const planCount = Object.keys(s.plans||{}).length;
+  const libCount = (s.library||[]).length;
+  const dayCount = Object.values(s.plans||{}).reduce((a,p) => a + Object.keys(p).length, 0);
+  const gen = new Date(s.generated);
+  $("#snapshot-tape").textContent = "READY";
+  $("#snapshot-summary").textContent = `${planCount} plans · ${dayCount} days`;
+  $("#snapshot-meta").textContent = `${libCount} exercises in library · loaded ${gen.toLocaleDateString()}`;
+  $("#snapshot-detail").textContent = `Last imported: ${gen.toLocaleString()} — ${libCount} exercises, ${planCount} plans, ${dayCount} days, ${(s.recentLog||[]).length} historical sets.`;
+}
+
+function openPickPlan() {
+  if (!state.snapshot) { toast("Import a snapshot first (Settings)"); showView("settings"); return; }
+  const list = $("#plan-list"); list.innerHTML = "";
+  const plans = Object.entries(state.snapshot.plans);
+  if (plans.length === 0) list.appendChild(el("p", { class: "muted small" }, "No plans in your snapshot."));
+  for (const [name, days] of plans) {
+    list.appendChild(el("button", {
+      class: "option", onclick: () => openPickDay(name),
+    }, name, el("span", { class: "meta" }, `${Object.keys(days).length} days`)));
+  }
+  showView("pick-plan");
+}
+function openPickDay(planName) {
+  $("#pick-day-sub").textContent = planName;
+  const list = $("#day-list"); list.innerHTML = "";
+  for (const [name, exercises] of Object.entries(state.snapshot.plans[planName])) {
+    list.appendChild(el("button", {
+      class: "option", onclick: () => startSession(planName, name),
+    }, name, el("span", { class: "meta" }, `${exercises.length} ex`)));
+  }
+  showView("pick-day");
+}
+
+function startSession(planName, dayName) {
+  const today = new Date().toISOString().slice(0,10);
+  const exercises = state.snapshot.plans[planName][dayName].map(e => ({
+    ...e, sets: buildSets(e.targetSets), open: false,
+  }));
+  if (exercises.length > 0) exercises[0].open = true;
+  state.activeSession = { planName, dayName, date: today, exercises, startedAt: Date.now() };
+  persistSession();
+  renderSession();
+  showView("session");
+}
+function buildSets(targetSetsRaw) {
+  const n = parseInt(targetSetsRaw, 10);
+  const count = isFinite(n) && n > 0 ? Math.min(n, 10) : 3;
+  return Array.from({length: count}, () => ({ reps:"", weight:"", rpe:"", done:false }));
+}
+function persistSession() { return kvSet("activeSession", state.activeSession); }
+async function loadActiveSession() {
+  state.activeSession = await kvGet("activeSession") || null;
+  renderHomeActiveBanner();
+}
+function renderHomeActiveBanner() {
+  const card = $("#active-banner");
+  if (!state.activeSession) { card.style.display = "none"; return; }
+  card.style.display = "";
+  $("#active-banner-name").textContent = state.activeSession.dayName;
+  const done = state.activeSession.exercises.reduce((a,ex) => a + ex.sets.filter(s=>s.done).length, 0);
+  const tot = state.activeSession.exercises.reduce((a,ex) => a + ex.sets.length, 0);
+  $("#active-banner-stats").textContent = `${done}/${tot} sets · started ${new Date(state.activeSession.startedAt).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})}`;
+}
+
+function renderSession() {
+  const s = state.activeSession;
+  if (!s) { showView("home"); return; }
+  $("#session-title").textContent = s.dayName;
+  $("#session-date").textContent = `${s.planName} · ${s.date}`;
+  const done = s.exercises.reduce((a,ex) => a + ex.sets.filter(x=>x.done).length, 0);
+  const tot = s.exercises.reduce((a,ex) => a + ex.sets.length, 0);
+  $("#session-meta").textContent = `${done}/${tot} sets done`;
+  const list = $("#exercise-list"); list.innerHTML = "";
+  s.exercises.forEach((ex, idx) => list.appendChild(renderExercise(ex, idx)));
+}
+
+function renderExercise(ex, idx) {
+  const doneCount = ex.sets.filter(s => s.done).length;
+  const lastInfo = lastTimeSummary(ex.exercise);
+  const head = el("div", {
+    class: "ex-head",
+    onclick: () => { ex.open = !ex.open; renderSession(); persistSession(); },
+  },
+    el("span", { class: "name" }, ex.exercise),
+    el("span", { class: "meta" },
+      `${ex.targetSets || ex.sets.length}×${ex.targetReps || "—"}${ex.targetWeight ? " @ " + ex.targetWeight : ""}`),
+    el("span", { class: "check" }, doneCount === ex.sets.length && ex.sets.length > 0 ? "✓" : ""),
+  );
+  const body = el("div", { class: "ex-body" },
+    ex.notes ? el("div", { class: "notes" }, ex.notes) : null,
+    lastInfo ? el("div", { class: "last" }, lastInfo) : null,
+    el("div", { class: "set-headers" },
+      el("span", {}, "#"), el("span", {}, "Reps"), el("span", {}, "Weight"),
+      el("span", {}, "RPE"), el("span", {}, "Done")),
+    ...ex.sets.map((s, i) => renderSetRow(ex, i)),
+    el("button", {
+      class: "add-set",
+      onclick: () => { ex.sets.push({reps:"",weight:"",rpe:"",done:false}); renderSession(); persistSession(); },
+    }, "+ Add set"),
+  );
+  return el("div", { class: "ex" + (ex.open ? " open" : "") }, head, body);
+}
+
+function renderSetRow(ex, setIdx) {
+  const s = ex.sets[setIdx];
+  return el("div", { class: "set-row" + (s.done ? " done" : "") },
+    el("div", { class: "set-num" }, String(setIdx + 1)),
+    makeStepper(s, "reps", 1, ex.targetReps),
+    makeStepper(s, "weight", 5, ex.targetWeight),
+    makeRpeSelect(s),
+    makeCheckBtn(ex, setIdx),
+  );
+}
+
+function makeStepper(setObj, field, step, placeholder) {
+  const inp = el("input", {
+    type: "number", inputmode: "decimal",
+    value: setObj[field] === "" ? "" : setObj[field],
+    placeholder: placeholder ? String(placeholder).replace(/[^\d.\-]/g, "") : "",
+    oninput: (e) => { setObj[field] = e.target.value; persistSession(); },
+  });
+  const dec = el("button", { onclick: () => {
+    const v = parseFloat(inp.value || setObj[field] || placeholder || 0);
+    const next = Math.max(0, +(v - step).toFixed(2));
+    setObj[field] = String(next); inp.value = next; persistSession();
+  }}, "−");
+  const inc = el("button", { onclick: () => {
+    const v = parseFloat(inp.value || setObj[field] || placeholder || 0);
+    const next = +(v + step).toFixed(2);
+    setObj[field] = String(next); inp.value = next; persistSession();
+  }}, "+");
+  return el("div", { class: "stepper" }, dec, inp, inc);
+}
+
+function makeRpeSelect(setObj) {
+  const sel = el("select", {
+    class: "rpe",
+    onchange: (e) => { setObj.rpe = e.target.value; persistSession(); },
+  });
+  sel.appendChild(el("option", { value: "" }, "—"));
+  for (let r = 10; r >= 5; r -= 0.5) {
+    const opt = el("option", { value: String(r) }, r.toString());
+    if (String(setObj.rpe) === String(r)) opt.selected = true;
+    sel.appendChild(opt);
+  }
+  return sel;
+}
+
+function makeCheckBtn(ex, setIdx) {
+  const s = ex.sets[setIdx];
+  return el("button", { class: "check-btn", onclick: () => {
+    s.done = !s.done;
+    if (s.done) {
+      setsAdd({
+        date: state.activeSession.date,
+        workoutName: state.activeSession.dayName,
+        exercise: ex.exercise,
+        setNum: setIdx + 1,
+        reps: parseFloat(s.reps) || 0,
+        weight: parseFloat(s.weight) || 0,
+        rpe: parseFloat(s.rpe) || null,
+        notes: "", synced: 0, loggedAt: Date.now(),
+      });
+      if (ex.restSec) startRestTimer(ex.restSec);
+      if (navigator.vibrate) navigator.vibrate(30);
+    }
+    renderSession(); persistSession();
+  }}, s.done ? "✓" : "·");
+}
+
+function lastTimeSummary(exerciseName) {
+  if (!state.snapshot || !state.snapshot.recentLog) return null;
+  const matches = state.snapshot.recentLog
+    .filter(r => r.exercise === exerciseName)
+    .sort((a,b) => (b.date||"").localeCompare(a.date||""));
+  if (matches.length === 0) return null;
+  const lastDate = matches[0].date;
+  const lastDateSets = matches.filter(r => r.date === lastDate);
+  const summary = lastDateSets
+    .map(r => `${r.weight || "?"}×${r.reps || "?"}${r.rpe ? "@" + r.rpe : ""}`)
+    .join("  ");
+  const daysAgo = Math.round((Date.now() - new Date(lastDate)) / 86400000);
+  return `Last (${daysAgo}d ago): ${summary}`;
+}
+
+function startRestTimer(seconds) {
+  stopRestTimer();
+  const endsAt = Date.now() + seconds * 1000;
+  state.rest = { endsAt, intervalId: null };
+  $("#rest-timer").classList.add("active");
+  const tick = () => {
+    const remaining = Math.max(0, Math.round((endsAt - Date.now())/1000));
+    const m = Math.floor(remaining/60), s = remaining % 60;
+    $("#rest-countdown").textContent = `${m}:${String(s).padStart(2,"0")}`;
+    if (remaining === 0) {
+      stopRestTimer();
+      if (navigator.vibrate) navigator.vibrate([60,40,60]);
+      toast("Rest done — next set");
+    }
+  };
+  tick();
+  state.rest.intervalId = setInterval(tick, 250);
+}
+function stopRestTimer() {
+  if (state.rest) clearInterval(state.rest.intervalId);
+  state.rest = null;
+  $("#rest-timer").classList.remove("active");
+}
+
+async function finishSession() {
+  if (!state.activeSession) return;
+  const csv = buildSessionCSV(state.activeSession);
+  const total = state.activeSession.exercises.reduce((a,ex) => a + ex.sets.filter(s=>s.done).length, 0);
+  if (total === 0) { toast("No completed sets — nothing to export"); return; }
+  await shareOrDownload(csv,
+    `workout_${state.activeSession.date}_${slug(state.activeSession.dayName)}.csv`);
+  state.activeSession = null;
+  await kvSet("activeSession", null);
+  stopRestTimer();
+  renderHomeActiveBanner();
+  showView("home");
+  toast(`Exported ${total} sets — save to OneDrive pwa_inbox/`);
+}
+function buildSessionCSV(s) {
+  const lines = ["Date,Workout Name,Exercise,Set #,Reps,Weight (lbs),RPE,Notes"];
+  for (const ex of s.exercises) {
+    let setNum = 0;
+    for (const set of ex.sets) {
+      if (!set.done) continue;
+      setNum++;
+      lines.push([s.date, csvEscape(s.dayName), csvEscape(ex.exercise),
+        setNum, set.reps || "", set.weight || "", set.rpe || "", ""].join(","));
+    }
+  }
+  return lines.join("\n");
+}
+function csvEscape(v) {
+  if (v == null) return "";
+  const s = String(v);
+  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+function slug(s) { return String(s).toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""); }
+
+async function shareOrDownload(text, filename) {
+  const blob = new Blob([text], { type: "text/csv" });
+  const file = new File([blob], filename, { type: "text/csv" });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], title: filename }); return; }
+    catch (e) {}
+  }
+  const url = URL.createObjectURL(blob);
+  const a = el("a", { href: url, download: filename });
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
+async function exportAllSets(onlyUnsynced=false) {
+  const all = await setsAll();
+  const rows = onlyUnsynced ? all.filter(s => !s.synced) : all;
+  if (rows.length === 0) { toast("Nothing to export"); return; }
+  rows.sort((a,b) => (a.date + a.exercise + (a.loggedAt||0))
+                   .localeCompare(b.date + b.exercise + (b.loggedAt||0)));
+  const lines = ["Date,Workout Name,Exercise,Set #,Reps,Weight (lbs),RPE,Notes"];
+  for (const s of rows) {
+    lines.push([s.date, csvEscape(s.workoutName), csvEscape(s.exercise),
+      s.setNum, s.reps, s.weight, s.rpe || "", csvEscape(s.notes||"")].join(","));
+  }
+  await shareOrDownload(lines.join("\n"),
+    `pwa_export_${new Date().toISOString().slice(0,10)}_${rows.length}sets.csv`);
+  const store = (await openDB()).transaction("sets","readwrite").objectStore("sets");
+  for (const r of rows) { r.synced = 1; store.put(r); }
+  toast(`Exported ${rows.length} sets`);
+  refreshSettingsCounts();
+}
+async function refreshSettingsCounts() {
+  const all = await setsAll();
+  const unsynced = all.filter(s => !s.synced).length;
+  $("#export-detail").textContent = `${all.length} sets stored locally · ${unsynced} un-synced`;
+}
+
+async function renderHistory() {
+  const all = await setsAll();
+  const list = $("#history-list"); list.innerHTML = "";
+  if (all.length === 0) {
+    list.appendChild(el("p", { class: "muted small" }, "No sets logged yet."));
+    $("#history-count").textContent = "—"; return;
+  }
+  const byDate = {};
+  for (const s of all) (byDate[s.date] ||= []).push(s);
+  const dates = Object.keys(byDate).sort().reverse();
+  $("#history-count").textContent = `${all.length} sets across ${dates.length} sessions`;
+  for (const d of dates) {
+    const byEx = {};
+    for (const s of byDate[d]) (byEx[s.exercise] ||= []).push(s);
+    const linesHtml = Object.entries(byEx).map(([exName, exSets]) => {
+      exSets.sort((a,b) => a.setNum - b.setNum);
+      const sumPart = exSets.map(s => `${s.weight}×${s.reps}${s.rpe ? "@" + s.rpe : ""}`).join("  ");
+      return `<div><strong>${escapeHtml(exName)}</strong> &nbsp;<span class="muted">${sumPart}</span></div>`;
+    }).join("");
+    const card = el("div", { class: "log-day" });
+    card.appendChild(el("h3", {}, formatDateNice(d)));
+    card.appendChild(el("div", { class: "sets", html: linesHtml }));
+    list.appendChild(card);
+  }
+}
+function escapeHtml(s) { return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function formatDateNice(iso) {
+  const d = new Date(iso + "T12:00");
+  return d.toLocaleDateString(undefined, { weekday:"short", month:"short", day:"numeric", year:"numeric" });
+}
+
+function renderQuickLog() {
+  const list = $("#ql-sets"); list.innerHTML = "";
+  state._ql.sets.forEach((s, i) => {
+    const dummyEx = { sets: state._ql.sets, exercise: $("#ql-exercise").value || "(unnamed)" };
+    list.appendChild(renderSetRow(dummyEx, i));
+  });
+}
+
+document.addEventListener("click", (e) => {
+  const v = e.target.closest("[data-view]");
+  if (v) { showView(v.dataset.view); }
+});
+$("#btn-new-session").addEventListener("click", () => {
+  if (state.activeSession) {
+    if (!confirm("Discard the in-progress session and start a new one?")) return;
+    state.activeSession = null; kvSet("activeSession", null);
+  }
+  openPickPlan();
+});
+$("#btn-quick-log").addEventListener("click", () => showView("quick-log"));
+$("#btn-resume").addEventListener("click", () => { renderSession(); showView("session"); });
+$("#btn-finish").addEventListener("click", finishSession);
+$("#btn-abandon").addEventListener("click", () => {
+  if (!confirm("Abandon this session? Logged sets stay in your local history.")) return;
+  state.activeSession = null; kvSet("activeSession", null);
+  stopRestTimer(); renderHomeActiveBanner(); showView("home");
+});
+$("#ql-add").addEventListener("click", () => {
+  state._ql.sets.push({reps:"",weight:"",rpe:"",done:false}); renderQuickLog();
+});
+$("#ql-save").addEventListener("click", async () => {
+  const exName = ($("#ql-exercise").value || "").trim();
+  if (!exName) { toast("Pick an exercise first"); return; }
+  const today = new Date().toISOString().slice(0,10);
+  let saved = 0;
+  for (let i = 0; i < state._ql.sets.length; i++) {
+    const s = state._ql.sets[i];
+    if (!s.reps && !s.weight) continue;
+    await setsAdd({
+      date: today, workoutName: "Quick Log", exercise: exName,
+      setNum: i+1,
+      reps: parseFloat(s.reps) || 0, weight: parseFloat(s.weight) || 0,
+      rpe: parseFloat(s.rpe) || null,
+      notes: "", synced: 0, loggedAt: Date.now(),
+    });
+    saved++;
+  }
+  state._ql = null;
+  toast(`Saved ${saved} set(s)`);
+  showView("home");
+  refreshSettingsCounts();
+});
+$("#snapshot-file").addEventListener("change", async (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const text = await f.text();
+    const snap = JSON.parse(text);
+    if (!snap.library || !snap.plans) throw new Error("Missing library or plans");
+    await kvSet("snapshot", snap);
+    await loadSnapshot();
+    toast("Snapshot loaded");
+  } catch (err) { toast("Bad snapshot: " + err.message); }
+  e.target.value = "";
+});
+$("#btn-export-all").addEventListener("click", () => exportAllSets(false));
+$("#btn-export-unsynced").addEventListener("click", () => exportAllSets(true));
+$("#btn-mark-synced").addEventListener("click", async () => {
+  const all = await setsAll();
+  const store = (await openDB()).transaction("sets","readwrite").objectStore("sets");
+  for (const r of all) { r.synced = 1; store.put(r); }
+  toast("All marked synced"); refreshSettingsCounts();
+});
+$("#btn-clear-data").addEventListener("click", async () => {
+  if (!confirm("Erase every locally-stored set? Snapshot stays. Cannot be undone.")) return;
+  await setsClear(); toast("Local sets erased"); refreshSettingsCounts();
+});
+$("#rest-skip").addEventListener("click", () => { stopRestTimer(); toast("Rest skipped"); });
+
+(async () => {
+  await loadSnapshot();
+  await loadActiveSession();
+  if (state.activeSession) renderHomeActiveBanner();
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").catch(err => console.warn("SW failed:", err));
+  }
+})();
+</script>
+</body>
+</html>
