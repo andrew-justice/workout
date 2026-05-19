@@ -23,6 +23,23 @@
   --font-mono:"JetBrains Mono","SF Mono",Menlo,monospace;
   --radius:4px; --tap:56px;
 }
+/* Theme variants — applied via body class. Each one re-defines the palette
+   while keeping fonts and structural variables alone. */
+body.theme-carbon {
+  --paper:#0F0F10; --paper-2:#1A1A1C; --ink:#ECE6D6; --ink-soft:#C8C2B5;
+  --muted:#7A7670; --line:#2A2A2D; --accent:#FF6A2C; --accent-soft:#3A2418;
+  --success:#3FBE7E; --danger:#E04646; --shadow:rgba(0,0,0,0.5);
+}
+body.theme-forest {
+  --paper:#F2EEE0; --paper-2:#E3DDC8; --ink:#1A2820; --ink-soft:#3D4B40;
+  --muted:#7A8077; --line:#CFCBB8; --accent:#2D6A4F; --accent-soft:#D5E8DD;
+  --success:#2D6A4F; --danger:#B23A48; --shadow:rgba(26,40,32,0.08);
+}
+body.theme-iron {
+  --paper:#E8E6E1; --paper-2:#D5D2CB; --ink:#0E0E10; --ink-soft:#2E2E32;
+  --muted:#7C7B78; --line:#B8B5AE; --accent:#B91C1C; --accent-soft:#F4DADA;
+  --success:#1F7A4F; --danger:#7F1D1D; --shadow:rgba(14,14,16,0.10);
+}
 * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html,body { margin:0; padding:0; background:var(--paper); color:var(--ink); }
 body {
@@ -223,6 +240,120 @@ input[type="file"] { display:none; }
 .modal { display:none; position:fixed; inset:0; background:rgba(26,26,26,0.55); z-index:200; padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
 .modal.active { display:flex; align-items:flex-end; justify-content:center; animation:fade .15s ease; }
 .modal-card { background:var(--paper); padding:20px 16px 24px; border-radius:var(--radius) var(--radius) 0 0; width:100%; max-width:480px; border-top:3px solid var(--accent); }
+
+/* Theme swatches — 4 squares the user taps to pick a palette */
+.theme-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:10px 0 4px; }
+.theme-swatch {
+  aspect-ratio:1; border:2px solid var(--line); border-radius:var(--radius);
+  position:relative; overflow:hidden; cursor:pointer;
+  display:flex; flex-direction:column; justify-content:flex-end;
+  font-family:var(--font-display); font-size:11px; letter-spacing:0.08em;
+  padding:6px; color:var(--ink-soft); transition:border-color .15s, transform .08s;
+}
+.theme-swatch:active { transform:scale(0.97); }
+.theme-swatch.active { border-color:var(--accent); border-width:3px; }
+.theme-swatch .dots { display:flex; gap:3px; margin-bottom:auto; }
+.theme-swatch .dots span { width:10px; height:10px; border-radius:50%; }
+.theme-swatch[data-theme="paper"]  { background:#F5F1E8; color:#1A1A1A; }
+.theme-swatch[data-theme="paper"] .dots span:nth-child(1) { background:#1A1A1A; }
+.theme-swatch[data-theme="paper"] .dots span:nth-child(2) { background:#C2410C; }
+.theme-swatch[data-theme="paper"] .dots span:nth-child(3) { background:#D8CFBA; }
+.theme-swatch[data-theme="carbon"] { background:#0F0F10; color:#ECE6D6; }
+.theme-swatch[data-theme="carbon"] .dots span:nth-child(1) { background:#ECE6D6; }
+.theme-swatch[data-theme="carbon"] .dots span:nth-child(2) { background:#FF6A2C; }
+.theme-swatch[data-theme="carbon"] .dots span:nth-child(3) { background:#2A2A2D; }
+.theme-swatch[data-theme="forest"] { background:#F2EEE0; color:#1A2820; }
+.theme-swatch[data-theme="forest"] .dots span:nth-child(1) { background:#1A2820; }
+.theme-swatch[data-theme="forest"] .dots span:nth-child(2) { background:#2D6A4F; }
+.theme-swatch[data-theme="forest"] .dots span:nth-child(3) { background:#CFCBB8; }
+.theme-swatch[data-theme="iron"]   { background:#E8E6E1; color:#0E0E10; }
+.theme-swatch[data-theme="iron"] .dots span:nth-child(1) { background:#0E0E10; }
+.theme-swatch[data-theme="iron"] .dots span:nth-child(2) { background:#B91C1C; }
+.theme-swatch[data-theme="iron"] .dots span:nth-child(3) { background:#B8B5AE; }
+
+/* Segmented control for incremement / units / RPE pickers */
+.seg {
+  display:flex; border:1.5px solid var(--ink); border-radius:var(--radius);
+  overflow:hidden; background:var(--paper); margin-top:8px;
+}
+.seg button {
+  flex:1; min-height:44px; font-family:var(--font-mono); font-size:14px;
+  font-weight:700; color:var(--ink); border-right:1.5px solid var(--ink);
+  background:var(--paper); transition:background .08s;
+}
+.seg button:last-child { border-right:none; }
+.seg button.active { background:var(--accent); color:white; }
+.seg button:active:not(.active) { background:var(--paper-2); }
+.seg.small button { min-height:38px; font-size:12px; }
+
+/* Rest timer ± buttons */
+.rest-timer .adjust {
+  display:flex; gap:4px; margin-right:8px;
+}
+.rest-timer .adjust button {
+  min-width:38px; min-height:38px; padding:0; font-size:13px;
+  background:var(--paper-2); color:var(--ink);
+  font-family:var(--font-mono); font-weight:700;
+}
+
+/* Body weight quick card */
+.bw-quick {
+  display:flex; gap:8px; align-items:stretch; margin-top:8px;
+}
+.bw-quick input {
+  flex:1; padding:0 14px; font-family:var(--font-mono); font-weight:700;
+  font-size:18px; text-align:center;
+  border:1.5px solid var(--ink); border-radius:var(--radius);
+  background:var(--paper); color:var(--ink);
+  -webkit-appearance:none; appearance:none;
+}
+.bw-quick button { min-width:80px; padding:0 14px; }
+
+/* Session notes textarea */
+.session-notes {
+  width:100%; min-height:60px; padding:10px 12px;
+  border:1.5px solid var(--line); border-radius:var(--radius);
+  background:var(--paper-2); color:var(--ink); font-family:var(--font-body);
+  font-size:14px; line-height:1.4; resize:vertical;
+  margin:8px 0 16px;
+}
+.session-notes:focus { outline:none; border-color:var(--accent); }
+
+/* Sparkline — inline last-5-sessions history per exercise */
+.spark {
+  margin:10px 0 14px; padding:10px 8px 8px;
+  background:var(--paper-2); border-radius:var(--radius);
+  border:1px solid var(--line);
+}
+.spark-svg { display:block; width:100%; height:70px; }
+.spark-label {
+  font-family:var(--font-mono); font-size:10px;
+  color:var(--muted); letter-spacing:0.06em;
+  margin-bottom:4px; text-transform:uppercase;
+}
+.spark-empty {
+  font-family:var(--font-mono); font-size:11px;
+  color:var(--muted); text-align:center; padding:14px 4px;
+}
+
+/* PR badge — appears next to the check button on PR sets */
+.pr-badge {
+  display:inline-block; padding:2px 6px;
+  background:var(--accent); color:white;
+  font-family:var(--font-display); font-size:11px;
+  letter-spacing:0.1em; border-radius:2px;
+  margin-left:6px; vertical-align:middle;
+  animation:prFlash 0.5s ease-out;
+}
+@keyframes prFlash {
+  0%   { transform:scale(0); opacity:0; }
+  50%  { transform:scale(1.4); opacity:1; }
+  100% { transform:scale(1); opacity:1; }
+}
+.set-row.pr .check-btn {
+  border-color:var(--accent);
+  box-shadow:0 0 0 2px var(--accent-soft);
+}
 .muted { color:var(--muted); }
 .small { font-size:12px; }
 .spacer { height:24px; }
@@ -269,6 +400,15 @@ hr.rule { border:none; border-top:1.5px solid var(--ink); margin:24px 0 12px; }
 
     <button class="btn accent" id="btn-new-session">Start New Session</button>
     <button class="btn outline" id="btn-quick-log">Quick-log Single Set</button>
+
+    <div class="card" style="margin-top:14px">
+      <div class="label">Today's body weight</div>
+      <div class="bw-quick">
+        <input type="number" inputmode="decimal" id="bw-input" placeholder="—" step="0.1" />
+        <button class="btn outline" id="btn-bw-save" style="min-height:0">Log</button>
+      </div>
+      <div class="small muted" id="bw-status" style="margin-top:6px">Logs to Body Stats on next sync.</div>
+    </div>
   </section>
 
   <section class="view" id="view-pick-plan">
@@ -291,9 +431,12 @@ hr.rule { border:none; border-top:1.5px solid var(--ink); margin:24px 0 12px; }
       <span class="small muted" id="session-meta">—</span>
     </div>
     <p class="subtitle" id="session-date"></p>
+    <p class="small muted" id="session-summary" style="font-family:var(--font-mono); margin:-16px 0 20px; min-height:18px"></p>
     <div id="exercise-list"></div>
     <button class="add-set" id="btn-add-ex" style="min-height:52px;font-size:14px;margin-top:4px;">+ Add Off-Plan Exercise</button>
     <hr class="rule" />
+    <div class="label" style="margin-bottom:4px">Session notes</div>
+    <textarea class="session-notes" id="session-notes" placeholder="Felt strong today · slept 5h · tweaked left shoulder on row · etc."></textarea>
     <button class="btn accent" id="btn-finish">Finish & Export Session</button>
     <button class="btn ghost" id="btn-abandon">Abandon Session</button>
   </section>
@@ -344,6 +487,80 @@ hr.rule { border:none; border-top:1.5px solid var(--ink); margin:24px 0 12px; }
 
   <section class="view" id="view-settings">
     <h1 class="page-title">Settings &amp; <em>Sync</em></h1>
+
+    <div class="card">
+      <div class="label">Theme</div>
+      <p class="small">Pick a palette. Changes apply immediately.</p>
+      <div class="theme-grid" id="theme-grid">
+        <button class="theme-swatch" data-theme="paper">
+          <span class="dots"><span></span><span></span><span></span></span>
+          Paper
+        </button>
+        <button class="theme-swatch" data-theme="carbon">
+          <span class="dots"><span></span><span></span><span></span></span>
+          Carbon
+        </button>
+        <button class="theme-swatch" data-theme="forest">
+          <span class="dots"><span></span><span></span><span></span></span>
+          Forest
+        </button>
+        <button class="theme-swatch" data-theme="iron">
+          <span class="dots"><span></span><span></span><span></span></span>
+          Iron
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="label">Defaults</div>
+      <p class="small">Tune the steppers and timers to how you train.</p>
+
+      <div class="small muted" style="margin-top:14px">Weight increment</div>
+      <div class="seg small" id="seg-weight-inc">
+        <button data-val="2.5">2.5</button>
+        <button data-val="5">5</button>
+        <button data-val="10">10</button>
+      </div>
+
+      <div class="small muted" style="margin-top:14px">Rep increment</div>
+      <div class="seg small" id="seg-rep-inc">
+        <button data-val="1">1</button>
+        <button data-val="2">2</button>
+        <button data-val="5">5</button>
+      </div>
+
+      <div class="small muted" style="margin-top:14px">Default RPE (pre-fills the dropdown)</div>
+      <div class="seg small" id="seg-rpe">
+        <button data-val="">—</button>
+        <button data-val="7">7</button>
+        <button data-val="7.5">7.5</button>
+        <button data-val="8">8</button>
+        <button data-val="8.5">8.5</button>
+      </div>
+
+      <div class="small muted" style="margin-top:14px">Rest period adjustment (added to plan defaults)</div>
+      <div class="seg small" id="seg-rest">
+        <button data-val="-30">−30s</button>
+        <button data-val="-15">−15s</button>
+        <button data-val="0">0</button>
+        <button data-val="15">+15s</button>
+        <button data-val="30">+30s</button>
+        <button data-val="60">+60s</button>
+      </div>
+
+      <div class="small muted" style="margin-top:14px">Units</div>
+      <div class="seg small" id="seg-units">
+        <button data-val="lbs">lbs</button>
+        <button data-val="kg">kg</button>
+      </div>
+
+      <div class="small muted" style="margin-top:14px">Haptic feedback on set complete</div>
+      <div class="seg small" id="seg-haptic">
+        <button data-val="on">On</button>
+        <button data-val="off">Off</button>
+      </div>
+    </div>
+
     <div class="card">
       <div class="label">Snapshot</div>
       <p class="small">Import the <span class="kbd">snapshot.json</span> from your desktop sync tool to load plans, exercise library, and recent log.</p>
@@ -381,6 +598,10 @@ hr.rule { border:none; border-top:1.5px solid var(--ink); margin:24px 0 12px; }
   <div class="info">
     <div class="label">Rest</div>
     <div class="countdown" id="rest-countdown">0:00</div>
+  </div>
+  <div class="adjust">
+    <button id="rest-minus">−15</button>
+    <button id="rest-plus">+15</button>
   </div>
   <button id="rest-skip">Skip</button>
 </div>
@@ -439,7 +660,66 @@ const setsAdd = (s) => tx("sets","readwrite").then(st => idbReq(st.add(s)));
 const setsAll = () => tx("sets").then(s => idbReq(s.getAll()));
 const setsClear = () => tx("sets","readwrite").then(s => idbReq(s.clear()));
 
-const state = { snapshot: null, activeSession: null, view: "home", rest: null, _ql: null };
+const state = { snapshot: null, activeSession: null, view: "home", rest: null, _ql: null,
+                 settings: null, bodyWeights: [] };
+
+const DEFAULT_SETTINGS = {
+  theme: "paper",
+  weightIncrement: 5,
+  repIncrement: 1,
+  defaultRPE: "",
+  restAdjust: 0,
+  units: "lbs",
+  haptic: "on",
+};
+
+async function loadSettings() {
+  const stored = await kvGet("settings");
+  state.settings = Object.assign({}, DEFAULT_SETTINGS, stored || {});
+  applyTheme(state.settings.theme);
+  applySegmentSelections();
+  applyUnitsLabels();
+}
+async function saveSettings() {
+  await kvSet("settings", state.settings);
+}
+function applyTheme(theme) {
+  document.body.classList.remove("theme-paper", "theme-carbon", "theme-forest", "theme-iron");
+  if (theme && theme !== "paper") document.body.classList.add("theme-" + theme);
+  // Update theme-color meta for status bar tint
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) {
+    const styles = getComputedStyle(document.body);
+    meta.setAttribute("content", styles.getPropertyValue("--accent").trim() || "#C2410C");
+  }
+  // Highlight active swatch
+  document.querySelectorAll(".theme-swatch").forEach(b => {
+    b.classList.toggle("active", b.dataset.theme === theme);
+  });
+}
+function applySegmentSelections() {
+  setSeg("seg-weight-inc", state.settings.weightIncrement);
+  setSeg("seg-rep-inc", state.settings.repIncrement);
+  setSeg("seg-rpe", state.settings.defaultRPE);
+  setSeg("seg-rest", state.settings.restAdjust);
+  setSeg("seg-units", state.settings.units);
+  setSeg("seg-haptic", state.settings.haptic);
+}
+function setSeg(id, val) {
+  const grp = document.getElementById(id);
+  if (!grp) return;
+  grp.querySelectorAll("button").forEach(b => {
+    b.classList.toggle("active", String(b.dataset.val) === String(val));
+  });
+}
+function applyUnitsLabels() {
+  const u = state.settings.units;
+  // Update visible "lbs" -> "kg" labels in the UI where appropriate.
+  // We don't convert numbers — that's a future-self problem and risks data drift.
+  document.querySelectorAll("[data-unit-label]").forEach(el => {
+    el.textContent = u;
+  });
+}
 
 function showView(name) {
   $$(".view").forEach(v => v.classList.remove("active"));
@@ -508,9 +788,10 @@ function startSession(planName, dayName) {
     ...e, sets: buildSets(e.targetSets), open: false,
   }));
   if (exercises.length > 0) exercises[0].open = true;
-  state.activeSession = { planName, dayName, date: today, exercises, startedAt: Date.now() };
+  state.activeSession = { planName, dayName, date: today, exercises,
+                          startedAt: Date.now(), notes: "" };
   persistSession();
-  renderSession();
+  precomputeBests().then(() => { renderSession(); });
   showView("session");
 }
 function buildSets(targetSetsRaw) {
@@ -543,11 +824,16 @@ function renderSession() {
   $("#session-meta").textContent = `${done}/${tot} sets done`;
   const list = $("#exercise-list"); list.innerHTML = "";
   s.exercises.forEach((ex, idx) => list.appendChild(renderExercise(ex, idx)));
+  // Restore notes
+  $("#session-notes").value = s.notes || "";
+  // Live volume + top e1RM summary
+  updateSessionSummary();
 }
 
 function renderExercise(ex, idx) {
   const doneCount = ex.sets.filter(s => s.done).length;
   const lastInfo = lastTimeSummary(ex.exercise);
+  const sparkline = renderSparkline(ex.exercise);
   const head = el("div", {
     class: "ex-head",
     onclick: () => { ex.open = !ex.open; renderSession(); persistSession(); },
@@ -560,6 +846,7 @@ function renderExercise(ex, idx) {
   const body = el("div", { class: "ex-body" },
     ex.notes ? el("div", { class: "notes" }, ex.notes) : null,
     lastInfo ? el("div", { class: "last" }, lastInfo) : null,
+    sparkline,
     el("div", { class: "set-headers" },
       el("span", {}, "#"), el("span", {}, "Reps"), el("span", {}, "Weight"),
       el("span", {}, "RPE"), el("span", {}, "Done")),
@@ -574,10 +861,11 @@ function renderExercise(ex, idx) {
 
 function renderSetRow(ex, setIdx) {
   const s = ex.sets[setIdx];
-  return el("div", { class: "set-row" + (s.done ? " done" : "") },
+  const classes = "set-row" + (s.done ? " done" : "") + (s.pr ? " pr" : "");
+  return el("div", { class: classes },
     el("div", { class: "set-num" }, String(setIdx + 1)),
-    makeStepper(s, "reps", 1, ex.targetReps),
-    makeStepper(s, "weight", 5, ex.targetWeight),
+    makeStepper(s, "reps", state.settings?.repIncrement || 1, ex.targetReps),
+    makeStepper(s, "weight", state.settings?.weightIncrement || 5, ex.targetWeight),
     makeRpeSelect(s),
     makeCheckBtn(ex, setIdx),
   );
@@ -604,6 +892,10 @@ function makeStepper(setObj, field, step, placeholder) {
 }
 
 function makeRpeSelect(setObj) {
+  // If the set has no RPE yet and the user has a default configured, pre-fill it
+  if ((setObj.rpe === "" || setObj.rpe == null) && state.settings?.defaultRPE) {
+    setObj.rpe = state.settings.defaultRPE;
+  }
   const sel = el("select", {
     class: "rpe",
     onchange: (e) => { setObj.rpe = e.target.value; persistSession(); },
@@ -619,9 +911,27 @@ function makeRpeSelect(setObj) {
 
 function makeCheckBtn(ex, setIdx) {
   const s = ex.sets[setIdx];
+  const btnContent = s.done
+    ? (s.pr ? [el("span", {}, "✓"), el("span", { class: "pr-badge" }, "PR")] : ["✓"])
+    : ["·"];
   return el("button", { class: "check-btn", onclick: () => {
     s.done = !s.done;
     if (s.done) {
+      const newE1 = computeE1RM(s.weight, s.reps);
+      const prevBest = state.bestE1RM?.[ex.exercise] || 0;
+      // PR if new e1RM beats prior best by any margin AND it's a real lift
+      const isPR = newE1 > 0 && newE1 > prevBest && prevBest > 0;
+      if (isPR) {
+        s.pr = true;
+        state.bestE1RM[ex.exercise] = newE1;
+        toast(`PR! ${ex.exercise}: e1RM ${newE1.toFixed(1)} lb`);
+        if (state.settings?.haptic !== "off" && navigator.vibrate) {
+          navigator.vibrate([90, 60, 90, 60, 200]); // distinct PR pattern
+        }
+      } else if (newE1 > 0 && prevBest === 0) {
+        // First-ever set of this exercise — record the baseline silently
+        state.bestE1RM[ex.exercise] = newE1;
+      }
       setsAdd({
         date: state.activeSession.date,
         workoutName: state.activeSession.dayName,
@@ -631,12 +941,21 @@ function makeCheckBtn(ex, setIdx) {
         weight: parseFloat(s.weight) || 0,
         rpe: parseFloat(s.rpe) || null,
         notes: "", synced: 0, loggedAt: Date.now(),
+        pr: isPR ? 1 : 0,
       });
-      if (ex.restSec) startRestTimer(ex.restSec);
-      if (navigator.vibrate) navigator.vibrate(30);
+      if (ex.restSec) {
+        const adj = parseInt(state.settings?.restAdjust || 0, 10);
+        const total = Math.max(5, ex.restSec + adj);
+        startRestTimer(total);
+      }
+      if (!isPR && state.settings?.haptic !== "off" && navigator.vibrate) navigator.vibrate(30);
+    } else {
+      // Un-marking a set: keep the bestE1RM map alone (workbook is the real
+      // source of truth on sync), but drop the badge so the UI doesn't lie.
+      s.pr = false;
     }
     renderSession(); persistSession();
-  }}, s.done ? "✓" : "·");
+  }}, ...btnContent);
 }
 
 function lastTimeSummary(exerciseName) {
@@ -654,23 +973,177 @@ function lastTimeSummary(exerciseName) {
   return `Last (${daysAgo}d ago): ${summary}`;
 }
 
+/* ── e1RM + PR detection ────────────────────────────────────────── */
+function computeE1RM(weight, reps) {
+  const w = parseFloat(weight), r = parseFloat(reps);
+  if (!w || !r || r <= 0 || r > 12) return 0;
+  return w * (1 + r / 30);
+}
+
+async function precomputeBests() {
+  /* Build a map of exercise → best e1RM ever, combining the snapshot's
+     recentLog with locally-logged sets. Cached on state.bestE1RM and
+     mutated live as new PRs are hit. */
+  const best = {};
+  if (state.snapshot?.recentLog) {
+    for (const r of state.snapshot.recentLog) {
+      const e1 = computeE1RM(r.weight, r.reps);
+      if (e1 > (best[r.exercise] || 0)) best[r.exercise] = e1;
+    }
+  }
+  const localSets = await setsAll();
+  for (const s of localSets) {
+    const e1 = computeE1RM(s.weight, s.reps);
+    if (e1 > (best[s.exercise] || 0)) best[s.exercise] = e1;
+  }
+  state.bestE1RM = best;
+}
+
+/* ── Last-5-sessions sparkline ──────────────────────────────────── */
+function renderSparkline(exerciseName) {
+  if (!state.snapshot?.recentLog) return null;
+  // Group all sets of this exercise by date, take top e1RM per date
+  const byDate = {};
+  for (const r of state.snapshot.recentLog) {
+    if (r.exercise !== exerciseName) continue;
+    const e1 = computeE1RM(r.weight, r.reps);
+    if (e1 <= 0) continue;
+    if (!byDate[r.date] || byDate[r.date].e1 < e1) {
+      byDate[r.date] = { e1, weight: r.weight, reps: r.reps };
+    }
+  }
+  const points = Object.entries(byDate)
+    .sort((a,b) => a[0].localeCompare(b[0]))
+    .slice(-5);
+  if (points.length === 0) return null;
+
+  const container = el("div", { class: "spark" });
+  container.appendChild(el("div", { class: "spark-label" },
+    `e1RM trend · last ${points.length} session${points.length===1?"":"s"}`));
+
+  if (points.length === 1) {
+    const [date, p] = points[0];
+    container.appendChild(el("div", { class: "spark-empty" },
+      `${p.weight}×${p.reps} → e1RM ${p.e1.toFixed(0)} lb (just one session — keep going)`));
+    return container;
+  }
+
+  // SVG line + dots, no external lib
+  const W = 280, H = 60, PAD_X = 16, PAD_Y = 8;
+  const values = points.map(p => p[1].e1);
+  const minV = Math.min(...values), maxV = Math.max(...values);
+  const range = (maxV - minV) || 1;
+  const dx = (W - 2 * PAD_X) / Math.max(1, points.length - 1);
+
+  const svgNs = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(svgNs, "svg");
+  svg.setAttribute("class", "spark-svg");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H + 22}`);
+  svg.setAttribute("preserveAspectRatio", "none");
+
+  // baseline (min) and ceiling (max) reference lines
+  const styles = getComputedStyle(document.body);
+  const accent = styles.getPropertyValue("--accent").trim() || "#C2410C";
+  const ink = styles.getPropertyValue("--ink").trim() || "#1A1A1A";
+  const muted = styles.getPropertyValue("--muted").trim() || "#888";
+
+  // line
+  const pathD = points.map(([_, p], i) => {
+    const x = PAD_X + i * dx;
+    const y = PAD_Y + (H - 2*PAD_Y) * (1 - (p.e1 - minV) / range);
+    return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+  const line = document.createElementNS(svgNs, "path");
+  line.setAttribute("d", pathD);
+  line.setAttribute("fill", "none");
+  line.setAttribute("stroke", accent);
+  line.setAttribute("stroke-width", "2");
+  line.setAttribute("stroke-linejoin", "round");
+  svg.appendChild(line);
+
+  // dots + labels
+  points.forEach(([date, p], i) => {
+    const x = PAD_X + i * dx;
+    const y = PAD_Y + (H - 2*PAD_Y) * (1 - (p.e1 - minV) / range);
+    const isMax = p.e1 === maxV;
+    const c = document.createElementNS(svgNs, "circle");
+    c.setAttribute("cx", x); c.setAttribute("cy", y);
+    c.setAttribute("r", isMax ? 4 : 3);
+    c.setAttribute("fill", isMax ? accent : ink);
+    svg.appendChild(c);
+
+    // weight×reps label above each dot
+    const lbl = document.createElementNS(svgNs, "text");
+    lbl.setAttribute("x", x);
+    lbl.setAttribute("y", Math.max(PAD_Y - 1, y - 7));
+    lbl.setAttribute("text-anchor", "middle");
+    lbl.setAttribute("font-size", "8");
+    lbl.setAttribute("font-family", "monospace");
+    lbl.setAttribute("fill", ink);
+    lbl.textContent = `${p.weight}×${p.reps}`;
+    svg.appendChild(lbl);
+
+    // date label below
+    const md = date.slice(5).replace("-", "/"); // "05-17" → "05/17"
+    const dlbl = document.createElementNS(svgNs, "text");
+    dlbl.setAttribute("x", x);
+    dlbl.setAttribute("y", H + 14);
+    dlbl.setAttribute("text-anchor", "middle");
+    dlbl.setAttribute("font-size", "8");
+    dlbl.setAttribute("font-family", "monospace");
+    dlbl.setAttribute("fill", muted);
+    dlbl.textContent = md;
+    svg.appendChild(dlbl);
+  });
+
+  container.appendChild(svg);
+  return container;
+}
+
+/* ── Live session summary (volume + top e1RM) ───────────────────── */
+function updateSessionSummary() {
+  const s = state.activeSession;
+  const el = document.getElementById("session-summary");
+  if (!s || !el) return;
+  let totalVol = 0, topE1 = 0, topEx = "";
+  for (const ex of s.exercises) {
+    for (const set of ex.sets) {
+      if (!set.done) continue;
+      totalVol += (parseFloat(set.reps)||0) * (parseFloat(set.weight)||0);
+      const e1 = computeE1RM(set.weight, set.reps);
+      if (e1 > topE1) { topE1 = e1; topEx = ex.exercise; }
+    }
+  }
+  if (totalVol === 0) { el.textContent = ""; return; }
+  const shortEx = topEx.length > 18 ? topEx.slice(0, 16) + "…" : topEx;
+  el.textContent = `vol: ${Math.round(totalVol).toLocaleString()} lbs`
+    + (topE1 ? ` · top e1RM: ${shortEx} ${topE1.toFixed(0)}` : "");
+}
+
 function startRestTimer(seconds) {
   stopRestTimer();
   const endsAt = Date.now() + seconds * 1000;
   state.rest = { endsAt, intervalId: null };
   $("#rest-timer").classList.add("active");
   const tick = () => {
-    const remaining = Math.max(0, Math.round((endsAt - Date.now())/1000));
+    const remaining = Math.max(0, Math.round((state.rest.endsAt - Date.now())/1000));
     const m = Math.floor(remaining/60), s = remaining % 60;
     $("#rest-countdown").textContent = `${m}:${String(s).padStart(2,"0")}`;
     if (remaining === 0) {
       stopRestTimer();
-      if (navigator.vibrate) navigator.vibrate([60,40,60]);
+      if (state.settings?.haptic !== "off" && navigator.vibrate) navigator.vibrate([60,40,60]);
       toast("Rest done — next set");
     }
   };
   tick();
   state.rest.intervalId = setInterval(tick, 250);
+}
+function adjustRest(seconds) {
+  if (!state.rest) return;
+  state.rest.endsAt += seconds * 1000;
+  // Don't let it go negative
+  const now = Date.now();
+  if (state.rest.endsAt < now + 1000) state.rest.endsAt = now + 1000;
 }
 function stopRestTimer() {
   if (state.rest) clearInterval(state.rest.intervalId);
@@ -694,13 +1167,19 @@ async function finishSession() {
 }
 function buildSessionCSV(s) {
   const lines = ["Date,Workout Name,Exercise,Set #,Reps,Weight (lbs),RPE,Notes"];
+  const notes = (s.notes || "").trim();
+  let firstRowNoteEmitted = false;
   for (const ex of s.exercises) {
     let setNum = 0;
     for (const set of ex.sets) {
       if (!set.done) continue;
       setNum++;
+      const rowNote = !firstRowNoteEmitted && notes
+        ? `[session] ${notes}` : "";
+      if (rowNote) firstRowNoteEmitted = true;
       lines.push([s.date, csvEscape(s.dayName), csvEscape(ex.exercise),
-        setNum, set.reps || "", set.weight || "", set.rpe || "", ""].join(","));
+        setNum, set.reps || "", set.weight || "", set.rpe || "",
+        csvEscape(rowNote)].join(","));
     }
   }
   return lines.join("\n");
@@ -728,7 +1207,14 @@ async function shareOrDownload(text, filename) {
 async function exportAllSets(onlyUnsynced=false) {
   const all = await setsAll();
   const rows = onlyUnsynced ? all.filter(s => !s.synced) : all;
-  if (rows.length === 0) { toast("Nothing to export"); return; }
+  if (rows.length === 0) {
+    // Maybe just body weights to export?
+    const bw = (await kvGet("bodyWeights")) || [];
+    const bwToSync = onlyUnsynced ? bw.filter(e => !e.synced) : bw;
+    if (bwToSync.length === 0) { toast("Nothing to export"); return; }
+    await exportBodyWeights(bwToSync);
+    return;
+  }
   rows.sort((a,b) => (a.date + a.exercise + (a.loggedAt||0))
                    .localeCompare(b.date + b.exercise + (b.loggedAt||0)));
   const lines = ["Date,Workout Name,Exercise,Set #,Reps,Weight (lbs),RPE,Notes"];
@@ -741,7 +1227,27 @@ async function exportAllSets(onlyUnsynced=false) {
   const store = (await openDB()).transaction("sets","readwrite").objectStore("sets");
   for (const r of rows) { r.synced = 1; store.put(r); }
   toast(`Exported ${rows.length} sets`);
+  // Also export un-synced body weights in a sibling file
+  const bw = (await kvGet("bodyWeights")) || [];
+  const bwUnsynced = bw.filter(e => !e.synced);
+  if (bwUnsynced.length > 0) {
+    await exportBodyWeights(bwUnsynced);
+  }
   refreshSettingsCounts();
+}
+async function exportBodyWeights(entries) {
+  const lines = ["Date,Body Weight (lbs),Body Fat %,Notes"];
+  for (const e of entries) {
+    lines.push([e.date, e.weight, "", ""].join(","));
+  }
+  await shareOrDownload(lines.join("\n"),
+    `pwa_bodyweight_${new Date().toISOString().slice(0,10)}_${entries.length}.csv`);
+  const all = (await kvGet("bodyWeights")) || [];
+  for (const e of all) {
+    if (entries.find(x => x.date === e.date)) e.synced = 1;
+  }
+  await kvSet("bodyWeights", all);
+  renderBodyWeightStatus();
 }
 async function refreshSettingsCounts() {
   const all = await setsAll();
@@ -899,10 +1405,84 @@ $("#btn-clear-data").addEventListener("click", async () => {
   await setsClear(); toast("Local sets erased"); refreshSettingsCounts();
 });
 $("#rest-skip").addEventListener("click", () => { stopRestTimer(); toast("Rest skipped"); });
+$("#rest-minus").addEventListener("click", () => { adjustRest(-15); });
+$("#rest-plus").addEventListener("click", () => { adjustRest(15); });
+
+/* ── Settings: theme + segment controls ── */
+document.querySelectorAll(".theme-swatch").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    state.settings.theme = btn.dataset.theme;
+    applyTheme(state.settings.theme);
+    await saveSettings();
+  });
+});
+function wireSegment(id, settingKey, parseFn = (v) => v) {
+  const grp = document.getElementById(id);
+  if (!grp) return;
+  grp.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const val = parseFn(btn.dataset.val);
+      state.settings[settingKey] = val;
+      setSeg(id, btn.dataset.val);
+      if (settingKey === "units") applyUnitsLabels();
+      await saveSettings();
+    });
+  });
+}
+wireSegment("seg-weight-inc", "weightIncrement", v => parseFloat(v));
+wireSegment("seg-rep-inc",    "repIncrement",    v => parseInt(v, 10));
+wireSegment("seg-rpe",        "defaultRPE",      v => v);
+wireSegment("seg-rest",       "restAdjust",      v => parseInt(v, 10));
+wireSegment("seg-units",      "units",           v => v);
+wireSegment("seg-haptic",     "haptic",          v => v);
+
+/* ── Session notes persistence ── */
+document.addEventListener("input", (e) => {
+  if (e.target && e.target.id === "session-notes" && state.activeSession) {
+    state.activeSession.notes = e.target.value;
+    persistSession();
+  }
+});
+
+/* ── Body weight quick-log ── */
+async function saveBodyWeight() {
+  const v = parseFloat($("#bw-input").value);
+  if (!v || v <= 0) { toast("Enter a body weight first"); return; }
+  const today = new Date().toISOString().slice(0,10);
+  const entries = (await kvGet("bodyWeights")) || [];
+  // Replace any existing entry for today
+  const filtered = entries.filter(e => e.date !== today);
+  filtered.push({ date: today, weight: v, synced: 0 });
+  await kvSet("bodyWeights", filtered);
+  $("#bw-input").value = "";
+  renderBodyWeightStatus();
+  toast(`Body weight ${v} logged`);
+  if (state.settings?.haptic !== "off" && navigator.vibrate) navigator.vibrate(30);
+}
+async function renderBodyWeightStatus() {
+  const entries = (await kvGet("bodyWeights")) || [];
+  if (entries.length === 0) {
+    $("#bw-status").textContent = "Logs to Body Stats on next sync.";
+    return;
+  }
+  const last = entries[entries.length - 1];
+  const unsynced = entries.filter(e => !e.synced).length;
+  const u = state.settings?.units || "lbs";
+  $("#bw-status").textContent =
+    `Last: ${last.weight} ${u} on ${last.date}` +
+    (unsynced ? ` · ${unsynced} un-synced` : "");
+}
+$("#btn-bw-save").addEventListener("click", saveBodyWeight);
+$("#bw-input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") { e.preventDefault(); saveBodyWeight(); }
+});
 
 (async () => {
+  await loadSettings();
   await loadSnapshot();
   await loadActiveSession();
+  await renderBodyWeightStatus();
+  await precomputeBests();
   if (state.activeSession) renderHomeActiveBanner();
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js").catch(err => console.warn("SW failed:", err));
