@@ -354,6 +354,35 @@ input[type="file"] { display:none; }
   border-color:var(--accent);
   box-shadow:0 0 0 2px var(--accent-soft);
 }
+
+/* Custom autocomplete (replaces iOS-flaky <datalist>) */
+.ac-wrap { position:relative; }
+.ac-list {
+  position:absolute; left:0; right:0; top:100%;
+  background:var(--paper); border:1.5px solid var(--ink); border-top:none;
+  border-radius:0 0 var(--radius) var(--radius);
+  max-height:260px; overflow-y:auto; z-index:50;
+  box-shadow:0 8px 24px var(--shadow);
+  display:none;
+}
+.ac-list.open { display:block; }
+.ac-item {
+  padding:12px 14px; min-height:48px;
+  display:flex; align-items:center; cursor:pointer;
+  border-bottom:1px solid var(--line); font-size:15px;
+  color:var(--ink); background:var(--paper);
+}
+.ac-item:last-child { border-bottom:none; }
+.ac-item:active, .ac-item.highlighted { background:var(--accent-soft); }
+.ac-item .group {
+  font-family:var(--font-mono); font-size:10px; color:var(--muted);
+  margin-left:auto; text-transform:uppercase; letter-spacing:0.08em;
+}
+.ac-item .match { font-weight:700; color:var(--accent); }
+.ac-empty {
+  padding:14px; color:var(--muted); font-size:13px;
+  text-align:center; font-style:italic;
+}
 .muted { color:var(--muted); }
 .small { font-size:12px; }
 .spacer { height:24px; }
@@ -444,8 +473,11 @@ hr.rule { border:none; border-top:1.5px solid var(--ink); margin:24px 0 12px; }
   <div class="modal" id="add-ex-modal">
     <div class="modal-card">
       <div class="label">Add exercise to this session</div>
-      <input list="ex-datalist" id="add-ex-name" placeholder="Exercise (type or pick)"
-        style="width:100%;padding:14px 12px;font-size:16px;border:1.5px solid var(--ink);border-radius:var(--radius);margin:10px 0;" />
+      <div class="ac-wrap">
+        <input type="text" id="add-ex-name" placeholder="Exercise (type or pick)" autocomplete="off"
+          style="width:100%;padding:14px 12px;font-size:16px;border:1.5px solid var(--ink);border-radius:var(--radius);margin:10px 0;" />
+        <div class="ac-list" id="add-ex-ac"></div>
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
         <label class="small muted">Sets
           <input type="number" id="add-ex-sets" value="3" min="1" max="20"
@@ -466,9 +498,11 @@ hr.rule { border:none; border-top:1.5px solid var(--ink); margin:24px 0 12px; }
     <p class="subtitle">Off-plan set or a one-off lift.</p>
     <div class="card">
       <div class="label">Exercise</div>
-      <input list="ex-datalist" id="ql-exercise" placeholder="Type or pick…"
-        style="width:100%;padding:14px 12px;font-size:16px;border:1.5px solid var(--ink);border-radius:var(--radius);margin-top:6px;" />
-      <datalist id="ex-datalist"></datalist>
+      <div class="ac-wrap">
+        <input type="text" id="ql-exercise" placeholder="Type or pick…" autocomplete="off"
+          style="width:100%; padding:14px 12px; font-size:16px; border:1.5px solid var(--ink); border-radius:var(--radius); margin-top:6px;" />
+        <div class="ac-list" id="ql-ac"></div>
+      </div>
     </div>
     <div class="set-headers"><span></span><span>Reps</span><span>Weight</span><span>RPE</span><span></span></div>
     <div id="ql-sets"></div>
@@ -735,10 +769,6 @@ function showView(name) {
 async function loadSnapshot() {
   state.snapshot = await kvGet("snapshot") || null;
   renderSnapshotStatus();
-  const dl = $("#ex-datalist"); dl.innerHTML = "";
-  if (state.snapshot?.library) {
-    for (const ex of state.snapshot.library) dl.appendChild(el("option", { value: ex.name }));
-  }
 }
 function renderSnapshotStatus() {
   if (!state.snapshot) {
@@ -956,6 +986,95 @@ function makeCheckBtn(ex, setIdx) {
     }
     renderSession(); persistSession();
   }}, ...btnContent);
+}
+
+/* ── Reusable autocomplete controller ───────────────────────────
+   iOS Safari's <datalist> is unreliable in standalone PWAs, so we
+   roll our own. Two instances: add-exercise modal + quick-log input.
+   ───────────────────────────────────────────────────────────────── */
+function attachAutocomplete(inputId, listId, getLibrary) {
+  const input = document.getElementById(inputId);
+  const list = document.getElementById(listId);
+  if (!input || !list) return;
+  let highlighted = -1;
+
+  function render(query) {
+    const items = getLibrary() || [];
+    const q = (query || "").trim().toLowerCase();
+    let matches;
+    if (!q) {
+      matches = items.slice(0, 50);
+    } else {
+      // Score: starts-with > contains > word-start
+      const scored = items.map(it => {
+        const n = it.name.toLowerCase();
+        let score = -1;
+        if (n.startsWith(q)) score = 1000 - n.length;
+        else if (n.includes(" " + q)) score = 800 - n.length;
+        else if (n.includes(q)) score = 500 - n.length;
+        return { item: it, score };
+      }).filter(x => x.score > -1);
+      scored.sort((a, b) => b.score - a.score);
+      matches = scored.slice(0, 30).map(x => x.item);
+    }
+
+    list.innerHTML = "";
+    if (matches.length === 0) {
+      list.appendChild(el("div", { class: "ac-empty" },
+        q ? `No matches for "${q}" — tap Add to use anyway` : "Library is empty"));
+      list.classList.add("open");
+      highlighted = -1;
+      return;
+    }
+    matches.forEach((it, i) => {
+      const node = el("div", { class: "ac-item",
+        onclick: (e) => { e.preventDefault(); pick(it.name); },
+      });
+      // Highlight matched substring
+      const idx = q ? it.name.toLowerCase().indexOf(q) : -1;
+      if (idx >= 0 && q) {
+        node.appendChild(document.createTextNode(it.name.slice(0, idx)));
+        node.appendChild(el("span", { class: "match" }, it.name.slice(idx, idx + q.length)));
+        node.appendChild(document.createTextNode(it.name.slice(idx + q.length)));
+      } else {
+        node.appendChild(document.createTextNode(it.name));
+      }
+      if (it.primary) node.appendChild(el("span", { class: "group" }, it.primary));
+      list.appendChild(node);
+    });
+    list.classList.add("open");
+    highlighted = -1;
+  }
+
+  function pick(value) {
+    input.value = value;
+    list.classList.remove("open");
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+
+  input.addEventListener("focus", () => render(input.value));
+  input.addEventListener("input", () => render(input.value));
+  input.addEventListener("blur", () => {
+    // Delay so taps on list items still register
+    setTimeout(() => list.classList.remove("open"), 200);
+  });
+  input.addEventListener("keydown", (e) => {
+    const items = list.querySelectorAll(".ac-item");
+    if (e.key === "ArrowDown" && items.length) {
+      e.preventDefault();
+      highlighted = Math.min(items.length - 1, highlighted + 1);
+      items.forEach((n, i) => n.classList.toggle("highlighted", i === highlighted));
+    } else if (e.key === "ArrowUp" && items.length) {
+      e.preventDefault();
+      highlighted = Math.max(0, highlighted - 1);
+      items.forEach((n, i) => n.classList.toggle("highlighted", i === highlighted));
+    } else if (e.key === "Enter" && highlighted >= 0 && items[highlighted]) {
+      e.preventDefault();
+      items[highlighted].click();
+    } else if (e.key === "Escape") {
+      list.classList.remove("open");
+    }
+  });
 }
 
 function lastTimeSummary(exerciseName) {
@@ -1483,6 +1602,10 @@ $("#bw-input").addEventListener("keydown", (e) => {
   await loadActiveSession();
   await renderBodyWeightStatus();
   await precomputeBests();
+  // Attach autocompletes — they read from state.snapshot.library lazily
+  const getLib = () => state.snapshot?.library || [];
+  attachAutocomplete("add-ex-name", "add-ex-ac", getLib);
+  attachAutocomplete("ql-exercise", "ql-ac", getLib);
   if (state.activeSession) renderHomeActiveBanner();
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js").catch(err => console.warn("SW failed:", err));
