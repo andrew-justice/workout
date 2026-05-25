@@ -40,6 +40,26 @@ body.theme-iron {
   --muted:#7C7B78; --line:#B8B5AE; --accent:#B91C1C; --accent-soft:#F4DADA;
   --success:#1F7A4F; --danger:#7F1D1D; --shadow:rgba(14,14,16,0.10);
 }
+body.theme-midnight {
+  --paper:#070B14; --paper-2:#0E1525; --ink:#E0E8F5; --ink-soft:#A0B0C8;
+  --muted:#5A6880; --line:#151E32; --accent:#00C8B0; --accent-soft:#062028;
+  --success:#2ECC71; --danger:#E74C3C; --shadow:rgba(0,0,0,0.70);
+}
+body.theme-amber {
+  --paper:#FFFBEF; --paper-2:#F8F0D4; --ink:#2A1800; --ink-soft:#4A3010;
+  --muted:#8B7040; --line:#E8D89A; --accent:#C8900A; --accent-soft:#FFF3CC;
+  --success:#2D6A4F; --danger:#991B1B; --shadow:rgba(42,24,0,0.08);
+}
+body.theme-crimson {
+  --paper:#120408; --paper-2:#1E0A12; --ink:#F0E8DC; --ink-soft:#C8B8A8;
+  --muted:#806050; --line:#2E1020; --accent:#FFB830; --accent-soft:#302010;
+  --success:#4CAF50; --danger:#FF5050; --shadow:rgba(0,0,0,0.60);
+}
+body.theme-slate {
+  --paper:#F2F4F8; --paper-2:#E4E8F0; --ink:#1A1E2E; --ink-soft:#383E58;
+  --muted:#7A8098; --line:#C8CDD8; --accent:#4F60D8; --accent-soft:#E0E4FA;
+  --success:#1F7A4F; --danger:#B91C1C; --shadow:rgba(26,30,46,0.10);
+}
 * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html,body { margin:0; padding:0; background:var(--paper); color:var(--ink); }
 body {
@@ -52,23 +72,33 @@ button { font-family:inherit; font-size:inherit; color:inherit; background:none;
 input,select,textarea { font-family:inherit; font-size:inherit; color:var(--ink); }
 .app { max-width:480px; margin:0 auto; padding:0 16px; }
 header.bar {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:18px 0 14px; border-bottom:1.5px solid var(--ink); margin-bottom:18px;
+  flex-direction:column; align-items:stretch;
+  padding:14px 0 0; gap:0;
+  border-bottom:1.5px solid var(--ink); margin-bottom:18px;
 }
 header.bar .brand {
-  font-family:var(--font-display); font-size:28px; letter-spacing:0.08em;
-  display:flex; align-items:center; gap:10px;
+  font-family:var(--font-display); font-size:24px; letter-spacing:0.06em;
+  display:flex; align-items:center; gap:10px; padding-bottom:12px;
 }
 header.bar .brand::before {
-  content:""; display:inline-block; width:14px; height:14px;
-  background:var(--accent); transform:rotate(45deg);
+  content:""; display:inline-block; width:12px; height:12px;
+  background:var(--accent); transform:rotate(45deg); flex-shrink:0;
 }
-header.bar nav { display:flex; gap:4px; }
+header.bar nav {
+  display:flex; gap:0;
+  margin:0 -16px; /* bleed to screen edges */
+  border-top:1.5px solid var(--ink);
+}
 header.bar nav button {
-  font-size:12px; letter-spacing:0.12em; text-transform:uppercase;
-  padding:8px 10px; color:var(--muted); font-weight:700;
+  flex:1; text-align:center; min-height:42px;
+  font-size:11px; letter-spacing:0.10em; text-transform:uppercase;
+  font-weight:700; color:var(--muted); padding:10px 2px;
+  border-right:1px solid var(--line);
 }
-header.bar nav button.active { color:var(--accent); }
+header.bar nav button:last-child { border-right:none; }
+header.bar nav button.active {
+  color:var(--accent); background:var(--accent-soft);
+}
 .view { display:none; }
 .view.active { display:block; animation:fade .2s ease; }
 @keyframes fade { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
@@ -270,6 +300,22 @@ input[type="file"] { display:none; }
 .theme-swatch[data-theme="iron"] .dots span:nth-child(1) { background:#0E0E10; }
 .theme-swatch[data-theme="iron"] .dots span:nth-child(2) { background:#B91C1C; }
 .theme-swatch[data-theme="iron"] .dots span:nth-child(3) { background:#B8B5AE; }
+.theme-swatch[data-theme="midnight"] { background:#070B14; color:#E0E8F5; }
+.theme-swatch[data-theme="midnight"] .dots span:nth-child(1) { background:#E0E8F5; }
+.theme-swatch[data-theme="midnight"] .dots span:nth-child(2) { background:#00C8B0; }
+.theme-swatch[data-theme="midnight"] .dots span:nth-child(3) { background:#151E32; }
+.theme-swatch[data-theme="amber"]  { background:#FFFBEF; color:#2A1800; }
+.theme-swatch[data-theme="amber"] .dots span:nth-child(1) { background:#2A1800; }
+.theme-swatch[data-theme="amber"] .dots span:nth-child(2) { background:#C8900A; }
+.theme-swatch[data-theme="amber"] .dots span:nth-child(3) { background:#E8D89A; }
+.theme-swatch[data-theme="crimson"] { background:#120408; color:#F0E8DC; }
+.theme-swatch[data-theme="crimson"] .dots span:nth-child(1) { background:#F0E8DC; }
+.theme-swatch[data-theme="crimson"] .dots span:nth-child(2) { background:#FFB830; }
+.theme-swatch[data-theme="crimson"] .dots span:nth-child(3) { background:#2E1020; }
+.theme-swatch[data-theme="slate"]  { background:#F2F4F8; color:#1A1E2E; }
+.theme-swatch[data-theme="slate"] .dots span:nth-child(1) { background:#1A1E2E; }
+.theme-swatch[data-theme="slate"] .dots span:nth-child(2) { background:#4F60D8; }
+.theme-swatch[data-theme="slate"] .dots span:nth-child(3) { background:#C8CDD8; }
 
 /* Segmented control for incremement / units / RPE pickers */
 .seg {
@@ -565,6 +611,91 @@ input[type="file"] { display:none; }
   background:#FCFAF2; border:1.5px dashed var(--line);
   border-radius:var(--radius);
 }
+
+/* ───── Plan Editor ───── */
+.pe-picker {
+  display:flex; gap:8px; align-items:center; margin-bottom:16px;
+}
+.pe-select {
+  flex:1; padding:12px 10px; font-size:15px;
+  border:1.5px solid var(--ink); border-radius:var(--radius);
+  background:var(--paper); color:var(--ink);
+  font-family:var(--font-body); -webkit-appearance:none; appearance:none;
+}
+.pe-day {
+  border:1.5px solid var(--ink); border-radius:var(--radius);
+  margin-bottom:12px; overflow:hidden;
+}
+.pe-day-header {
+  display:flex; align-items:center; gap:6px;
+  padding:10px 12px; background:var(--paper-2);
+  border-bottom:1.5px solid var(--line);
+}
+.pe-day-name {
+  flex:1; font-family:var(--font-display); font-size:15px;
+  letter-spacing:0.06em; border:none; background:transparent;
+  color:var(--ink); padding:0; outline:none; min-width:0;
+}
+.pe-day-name::placeholder { color:var(--muted); }
+.pe-day-name:focus { background:var(--accent-soft); border-radius:2px; padding:0 4px; }
+.pe-ex-list { padding:6px 8px 4px; }
+.pe-ex-row {
+  border:1px solid var(--line); border-radius:var(--radius);
+  padding:8px; margin-bottom:6px; background:var(--paper);
+}
+.pe-ex-row:last-child { margin-bottom:0; }
+.pe-ex-top {
+  display:flex; gap:6px; align-items:flex-start; margin-bottom:6px;
+}
+.pe-ex-name-wrap { flex:1; position:relative; }
+.pe-ex-name {
+  width:100%; padding:8px 10px; font-size:14px;
+  border:1px solid var(--line); border-radius:var(--radius);
+  background:var(--paper); color:var(--ink); box-sizing:border-box;
+}
+.pe-ex-name:focus { outline:none; border-color:var(--accent); }
+.pe-ex-ctrl { display:flex; gap:4px; flex-shrink:0; }
+.pe-ex-ctrl button {
+  min-width:32px; min-height:32px; padding:0;
+  font-size:14px; background:var(--paper-2); color:var(--ink);
+  border-radius:var(--radius);
+}
+.pe-fields {
+  display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:6px;
+}
+.pe-field label {
+  display:block; font-size:9px; font-weight:700; letter-spacing:0.12em;
+  text-transform:uppercase; color:var(--muted); margin-bottom:3px;
+}
+.pe-field input, .pe-field select {
+  width:100%; padding:6px 8px; font-size:13px;
+  border:1px solid var(--line); border-radius:var(--radius);
+  background:var(--paper); color:var(--ink);
+  font-family:var(--font-mono); box-sizing:border-box;
+  -webkit-appearance:none; appearance:none;
+}
+.pe-field input:focus, .pe-field select:focus { outline:none; border-color:var(--accent); }
+.pe-add-ex {
+  width:100%; padding:10px; margin:6px 0 8px;
+  font-size:13px; background:var(--paper-2);
+  border:1px dashed var(--muted); border-radius:var(--radius);
+  color:var(--muted); text-align:center; cursor:pointer;
+}
+.pe-add-ex:active { background:var(--accent-soft); }
+.pe-add-day {
+  width:100%; padding:14px; margin-bottom:12px;
+  border:1.5px dashed var(--ink); border-radius:var(--radius);
+  background:var(--paper); color:var(--ink); font-size:14px;
+  font-family:var(--font-display); letter-spacing:0.08em;
+}
+.pe-actions {
+  display:flex; flex-direction:column; gap:8px; margin-top:8px; padding-top:16px;
+  border-top:1.5px solid var(--line);
+}
+.pe-note {
+  font-size:11px; color:var(--muted); text-align:center;
+  font-style:italic; margin-top:4px;
+}
 .muted { color:var(--muted); }
 .small { font-size:12px; }
 .spacer { height:24px; }
@@ -585,6 +716,7 @@ hr.rule { border:none; border-top:1.5px solid var(--ink); margin:24px 0 12px; }
     <nav>
       <button data-view="home" class="active">Home</button>
       <button data-view="history">Log</button>
+      <button data-view="plans">Plans</button>
       <button data-view="coach">Coach</button>
       <button data-view="settings">≡</button>
     </nav>
@@ -695,6 +827,12 @@ hr.rule { border:none; border-top:1.5px solid var(--ink); margin:24px 0 12px; }
     <button class="btn outline" data-view="home">Cancel</button>
   </section>
 
+  <section class="view" id="view-plans">
+    <h1 class="page-title">Plan <em>Editor</em></h1>
+    <p class="subtitle" id="pe-subtitle">Create and edit workout plans.</p>
+    <div id="pe-body"></div>
+  </section>
+
   <section class="view" id="view-coach">
     <h1 class="page-title">Training <em>Partner</em></h1>
     <p class="subtitle" id="coach-subtitle">—</p>
@@ -719,20 +857,28 @@ hr.rule { border:none; border-top:1.5px solid var(--ink); margin:24px 0 12px; }
       <p class="small">Pick a palette. Changes apply immediately.</p>
       <div class="theme-grid" id="theme-grid">
         <button class="theme-swatch" data-theme="paper">
-          <span class="dots"><span></span><span></span><span></span></span>
-          Paper
+          <span class="dots"><span></span><span></span><span></span></span>Paper
         </button>
         <button class="theme-swatch" data-theme="carbon">
-          <span class="dots"><span></span><span></span><span></span></span>
-          Carbon
+          <span class="dots"><span></span><span></span><span></span></span>Carbon
         </button>
         <button class="theme-swatch" data-theme="forest">
-          <span class="dots"><span></span><span></span><span></span></span>
-          Forest
+          <span class="dots"><span></span><span></span><span></span></span>Forest
         </button>
         <button class="theme-swatch" data-theme="iron">
-          <span class="dots"><span></span><span></span><span></span></span>
-          Iron
+          <span class="dots"><span></span><span></span><span></span></span>Iron
+        </button>
+        <button class="theme-swatch" data-theme="midnight">
+          <span class="dots"><span></span><span></span><span></span></span>Midnight
+        </button>
+        <button class="theme-swatch" data-theme="amber">
+          <span class="dots"><span></span><span></span><span></span></span>Amber
+        </button>
+        <button class="theme-swatch" data-theme="crimson">
+          <span class="dots"><span></span><span></span><span></span></span>Crimson
+        </button>
+        <button class="theme-swatch" data-theme="slate">
+          <span class="dots"><span></span><span></span><span></span></span>Slate
         </button>
       </div>
     </div>
@@ -887,7 +1033,8 @@ const setsAll = () => tx("sets").then(s => idbReq(s.getAll()));
 const setsClear = () => tx("sets","readwrite").then(s => idbReq(s.clear()));
 
 const state = { snapshot: null, activeSession: null, view: "home", rest: null, _ql: null,
-                 settings: null, bodyWeights: [] };
+                 settings: null, bodyWeights: [], planEdits: undefined,
+                 peActivePlan: null, bestE1RM: {} };
 
 const DEFAULT_SETTINGS = {
   theme: "paper",
@@ -954,6 +1101,7 @@ function showView(name) {
   state.view = name;
   window.scrollTo(0, 0);
   if (name === "history") renderHistory();
+  if (name === "plans") renderPlanEditor();
   if (name === "coach") renderCoach();
   if (name === "settings") refreshSettingsCounts();
   if (name === "quick-log") { if (!state._ql) state._ql = { sets: [{reps:"",weight:"",rpe:"",done:false}] }; renderQuickLog(); }
@@ -1510,9 +1658,9 @@ function csvEscape(v) {
 }
 function slug(s) { return String(s).toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""); }
 
-async function shareOrDownload(text, filename) {
-  const blob = new Blob([text], { type: "text/csv" });
-  const file = new File([blob], filename, { type: "text/csv" });
+async function shareOrDownload(text, filename, mime = "text/csv") {
+  const blob = new Blob([text], { type: mime });
+  const file = new File([blob], filename, { type: mime });
   if (navigator.canShare && navigator.canShare({ files: [file] })) {
     try { await navigator.share({ files: [file], title: filename }); return; }
     catch (e) {}
@@ -1520,7 +1668,7 @@ async function shareOrDownload(text, filename) {
   const url = URL.createObjectURL(blob);
   const a = el("a", { href: url, download: filename });
   document.body.appendChild(a); a.click(); a.remove();
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 async function exportAllSets(onlyUnsynced=false) {
@@ -1575,7 +1723,302 @@ async function refreshSettingsCounts() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   COACH VIEW — training partner / in-PWA dashboard
+   PLAN EDITOR
+   Plans live in IndexedDB("planEdits"), seeded from snapshot on
+   first open. Export → pwa_plans_DATE.json → pwa_inbox/ →
+   pwa_sync.py applies the changes to the Workout Plans sheet.
+   ═══════════════════════════════════════════════════════════════ */
+
+let peAutoSaveTimer = null;
+
+function peAutoSave() {
+  clearTimeout(peAutoSaveTimer);
+  peAutoSaveTimer = setTimeout(() => savePlanEdits(), 800);
+}
+
+async function loadPlanEdits() {
+  if (state.planEdits !== undefined) return;
+  const stored = await kvGet("planEdits");
+  if (stored) {
+    state.planEdits = stored;
+  } else if (state.snapshot?.plans) {
+    state.planEdits = JSON.parse(JSON.stringify(state.snapshot.plans));
+    await savePlanEdits();
+  } else {
+    state.planEdits = {};
+  }
+  if (state.peActivePlan == null) {
+    state.peActivePlan = Object.keys(state.planEdits)[0] || null;
+  }
+}
+
+async function savePlanEdits() {
+  await kvSet("planEdits", state.planEdits);
+}
+
+async function renderPlanEditor() {
+  await loadPlanEdits();
+  const body = $("#pe-body");
+  body.innerHTML = "";
+  const plans = Object.keys(state.planEdits);
+
+  // ── Plan picker ──
+  const picker = el("div", { class: "pe-picker" });
+  if (plans.length > 0) {
+    const sel = el("select", { class: "pe-select",
+      onchange: (e) => { state.peActivePlan = e.target.value; renderPlanEditor(); }
+    });
+    for (const p of plans) {
+      const opt = el("option", { value: p }, p);
+      if (p === state.peActivePlan) opt.selected = true;
+      sel.appendChild(opt);
+    }
+    picker.appendChild(sel);
+  } else {
+    picker.appendChild(el("span", { style: "color:var(--muted);font-size:13px;font-style:italic" },
+      "No plans yet."));
+  }
+  picker.appendChild(el("button", { class: "btn accent", style: "min-width:80px;min-height:44px",
+    onclick: peNewPlan }, "+ New"));
+  body.appendChild(picker);
+
+  // ── Current plan body ──
+  const plan = state.peActivePlan;
+  if (plan && state.planEdits[plan]) {
+    const days = state.planEdits[plan];
+
+    // Editable plan name
+    const nameWrap = el("div", { style: "margin-bottom:12px" });
+    const nameInput = el("input", {
+      type: "text", value: plan,
+      style: "width:100%;font-family:var(--font-display);font-size:22px;"+
+             "border:none;border-bottom:2px solid var(--ink);background:transparent;"+
+             "color:var(--ink);padding:4px 0;outline:none;letter-spacing:0.06em;",
+    });
+    nameInput.addEventListener("change", async () => {
+      const newName = nameInput.value.trim();
+      if (!newName || newName === plan) return;
+      if (state.planEdits[newName]) { toast("That plan name already exists"); return; }
+      state.planEdits[newName] = state.planEdits[plan];
+      delete state.planEdits[plan];
+      state.peActivePlan = newName;
+      await savePlanEdits();
+      renderPlanEditor();
+    });
+    nameWrap.appendChild(nameInput);
+    nameWrap.appendChild(el("div", { class: "small muted", style: "margin-top:4px" },
+      "Tap name to rename. Changes saved automatically."));
+    body.appendChild(nameWrap);
+
+    // Day cards
+    for (const [dayName, exercises] of Object.entries(days)) {
+      body.appendChild(peDayCard(plan, dayName, exercises));
+    }
+
+    // Add day
+    body.appendChild(el("button", { class: "pe-add-day", onclick: () => peAddDay(plan) },
+      "+ Add Day"));
+
+    // Action bar
+    const actions = el("div", { class: "pe-actions" });
+    actions.appendChild(el("button", { class: "btn accent", onclick: peExport },
+      "Export to Workbook"));
+    actions.appendChild(el("p", { class: "pe-note" },
+      "Saves a pwa_plans file to pwa_inbox/ on OneDrive. Run Sync Workout shortcut to apply."));
+    actions.appendChild(el("button", { class: "btn outline", onclick: () => peResetFromSnapshot(plan) },
+      "↺ Reset plan from snapshot"));
+    actions.appendChild(el("button", {
+      class: "btn ghost", style: "color:var(--danger)", onclick: () => peDeletePlan(plan),
+    }, "Delete this plan"));
+    body.appendChild(actions);
+  } else if (plans.length === 0) {
+    body.appendChild(el("div", { class: "coach-empty" },
+      'No plans yet. Tap "+ New" to create one, or import a snapshot that includes plan data.'));
+  }
+}
+
+function peDayCard(planName, dayName, exercises) {
+  const card = el("div", { class: "pe-day" });
+
+  // Header: editable day name + delete
+  const header = el("div", { class: "pe-day-header" });
+  const dayInput = el("input", {
+    type: "text", value: dayName, class: "pe-day-name",
+    placeholder: "Day name",
+  });
+  dayInput.addEventListener("change", async () => {
+    const newName = dayInput.value.trim();
+    if (!newName || newName === dayName) return;
+    const days = state.planEdits[planName];
+    const entries = Object.entries(days);
+    const rebuilt = {};
+    for (const [k, v] of entries) rebuilt[k === dayName ? newName : k] = v;
+    state.planEdits[planName] = rebuilt;
+    await savePlanEdits();
+    renderPlanEditor();
+  });
+  header.appendChild(dayInput);
+  header.appendChild(el("button", {
+    style: "min-width:32px;min-height:32px;padding:0;font-size:18px;"+
+           "background:transparent;color:var(--muted);",
+    onclick: async () => {
+      const exCount = Object.values(exercises).length;
+      if (exCount > 0 && !confirm(`Delete "${dayName}" and its ${exCount} exercises?`)) return;
+      delete state.planEdits[planName][dayName];
+      await savePlanEdits(); renderPlanEditor();
+    },
+  }, "×"));
+  card.appendChild(header);
+
+  // Exercise list
+  const list = el("div", { class: "pe-ex-list" });
+  exercises.forEach((ex, idx) => list.appendChild(peExRow(planName, dayName, exercises, idx)));
+
+  // Add exercise button
+  list.appendChild(el("button", { class: "pe-add-ex",
+    onclick: async () => {
+      exercises.push({ order: exercises.length + 1, exercise: "",
+        targetSets: "3", targetReps: "8", targetWeight: "", restSec: 90, notes: "" });
+      await savePlanEdits(); renderPlanEditor();
+    },
+  }, "+ Add Exercise"));
+  card.appendChild(list);
+  return card;
+}
+
+function peExRow(planName, dayName, exercises, idx) {
+  const ex = exercises[idx];
+  const row = el("div", { class: "pe-ex-row" });
+
+  // Top: name + reorder + delete
+  const top = el("div", { class: "pe-ex-top" });
+  const nameWrap = el("div", { class: "pe-ex-name-wrap" });
+  const nameInput = el("input", { type: "text", class: "pe-ex-name", value: ex.exercise || "",
+    placeholder: "Exercise name", autocomplete: "off" });
+  const acList = el("div", { class: "ac-list", id: "" });
+  nameWrap.appendChild(nameInput);
+  nameWrap.appendChild(acList);
+  nameInput.addEventListener("change", async () => {
+    ex.exercise = nameInput.value.trim();
+    peAutoSave();
+  });
+  attachAutocomplete(nameInput, acList, () => state.snapshot?.library || []);
+  top.appendChild(nameWrap);
+
+  const ctrl = el("div", { class: "pe-ex-ctrl" });
+  ctrl.appendChild(el("button", { title: "Move up",
+    onclick: async () => {
+      if (idx === 0) return;
+      [exercises[idx-1], exercises[idx]] = [exercises[idx], exercises[idx-1]];
+      await savePlanEdits(); renderPlanEditor();
+    },
+  }, "↑"));
+  ctrl.appendChild(el("button", { title: "Move down",
+    onclick: async () => {
+      if (idx >= exercises.length - 1) return;
+      [exercises[idx+1], exercises[idx]] = [exercises[idx], exercises[idx+1]];
+      await savePlanEdits(); renderPlanEditor();
+    },
+  }, "↓"));
+  ctrl.appendChild(el("button", { title: "Delete",
+    style: "color:var(--danger)",
+    onclick: async () => {
+      exercises.splice(idx, 1);
+      await savePlanEdits(); renderPlanEditor();
+    },
+  }, "×"));
+  top.appendChild(ctrl);
+  row.appendChild(top);
+
+  // Fields: Sets / Reps / Weight / Rest
+  const fields = el("div", { class: "pe-fields" });
+  const makeField = (label, key, type, opts) => {
+    const wrap = el("div", { class: "pe-field" });
+    wrap.appendChild(el("label", {}, label));
+    let inp;
+    if (opts) {
+      inp = el("select", {});
+      for (const [val, txt] of opts) {
+        const o = el("option", { value: val }, txt);
+        if (String(ex[key]) === String(val)) o.selected = true;
+        inp.appendChild(o);
+      }
+      inp.addEventListener("change", () => { ex[key] = inp.value; peAutoSave(); });
+    } else {
+      inp = el("input", { type, value: ex[key] || "", placeholder: "—" });
+      inp.addEventListener("change", () => { ex[key] = inp.value; peAutoSave(); });
+    }
+    wrap.appendChild(inp); return wrap;
+  };
+  const restOpts = [[30,"30s"],[45,"45s"],[60,"1m"],[90,"90s"],
+                    [120,"2m"],[150,"2.5m"],[180,"3m"],[240,"4m"],[300,"5m"]];
+  fields.appendChild(makeField("Sets", "targetSets", "text"));
+  fields.appendChild(makeField("Reps", "targetReps", "text"));
+  fields.appendChild(makeField("Weight", "targetWeight", "number"));
+  fields.appendChild(makeField("Rest", "restSec", null, restOpts));
+  row.appendChild(fields);
+  return row;
+}
+
+async function peNewPlan() {
+  const name = prompt("New plan name:");
+  if (!name || !name.trim()) return;
+  const n = name.trim();
+  if (state.planEdits[n]) { toast("A plan with that name already exists"); return; }
+  state.planEdits[n] = {};
+  state.peActivePlan = n;
+  await savePlanEdits();
+  renderPlanEditor();
+}
+
+async function peAddDay(planName) {
+  const name = prompt("Day name (e.g. Day 1 Upper Strength):");
+  if (!name || !name.trim()) return;
+  const n = name.trim();
+  if (state.planEdits[planName][n]) { toast("That day already exists"); return; }
+  state.planEdits[planName][n] = [];
+  await savePlanEdits();
+  renderPlanEditor();
+}
+
+async function peDeletePlan(planName) {
+  if (!confirm(`Delete plan "${planName}"? This removes it from the editor only; use Export to sync the deletion to your workbook.`)) return;
+  // null value signals deletion to pwa_sync.py
+  state.planEdits[planName] = null;
+  const remaining = Object.entries(state.planEdits).find(([,v]) => v !== null);
+  state.peActivePlan = remaining ? remaining[0] : null;
+  await savePlanEdits();
+  renderPlanEditor();
+}
+
+async function peResetFromSnapshot(planName) {
+  if (!state.snapshot?.plans?.[planName]) {
+    toast("This plan isn't in your snapshot. Import a fresh snapshot first."); return;
+  }
+  if (!confirm(`Reset "${planName}" to the workbook version? Your local edits to this plan will be lost.`)) return;
+  state.planEdits[planName] = JSON.parse(JSON.stringify(state.snapshot.plans[planName]));
+  await savePlanEdits();
+  renderPlanEditor();
+  toast("Plan reset from snapshot");
+}
+
+async function peExport() {
+  if (!state.planEdits || Object.keys(state.planEdits).length === 0) {
+    toast("No plans to export"); return;
+  }
+  const payload = JSON.stringify({
+    version: "1.0",
+    exported: new Date().toISOString(),
+    plans: state.planEdits,
+  }, null, 2);
+  const date = new Date().toISOString().slice(0, 10);
+  await shareOrDownload(payload, `pwa_plans_${date}.json`, "application/json");
+  toast("Plan file ready — save to OneDrive/pwa_inbox/, then run Sync shortcut");
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   COACH VIEW
+
    Pulls everything from IndexedDB (which is seeded from the snapshot
    plus PWA-logged sets). Renders 7 sections optimized for a phone:
      1. Pulse (KPI tiles for this week)

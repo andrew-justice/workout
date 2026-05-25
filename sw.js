@@ -2,7 +2,7 @@
 // Strategy: cache-first for the shell, network-first nothing (we're offline-first).
 // Bump CACHE_VERSION on every deploy to invalidate old caches.
 
-const CACHE_VERSION = "wt-v4";
+const CACHE_VERSION = "wt-v6";
 const SHELL = [
   "./",
   "./index.html",
