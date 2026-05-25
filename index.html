@@ -1100,11 +1100,18 @@ function computeE1RM(weight, reps) {
 }
 
 async function precomputeBests() {
-  /* Build a map of exercise → best e1RM ever, combining the snapshot's
-     recentLog with locally-logged sets. Cached on state.bestE1RM and
-     mutated live as new PRs are hit. */
+  /* Build a map of exercise → best e1RM ever. Three sources, in order:
+     1. snapshot.allTimePRs  — true historic bests from the full workbook
+     2. snapshot.recentLog   — fallback if allTimePRs missing
+     3. local sets store     — anything logged in the PWA but not yet synced
+     The max across all three wins. */
   const best = {};
-  if (state.snapshot?.recentLog) {
+  if (Array.isArray(state.snapshot?.allTimePRs)) {
+    for (const pr of state.snapshot.allTimePRs) {
+      if (pr.e1rm > (best[pr.exercise] || 0)) best[pr.exercise] = pr.e1rm;
+    }
+  }
+  if (Array.isArray(state.snapshot?.recentLog)) {
     for (const r of state.snapshot.recentLog) {
       const e1 = computeE1RM(r.weight, r.reps);
       if (e1 > (best[r.exercise] || 0)) best[r.exercise] = e1;
@@ -1506,8 +1513,48 @@ $("#snapshot-file").addEventListener("change", async (e) => {
     const snap = JSON.parse(text);
     if (!snap.library || !snap.plans) throw new Error("Missing library or plans");
     await kvSet("snapshot", snap);
+
+    // Seed the local sets store from the snapshot's recentLog, deduped by
+    // (date, exercise, setNum). Anything already present (e.g. set you
+    // logged in the PWA earlier today) is left alone.
+    let imported = 0;
+    if (Array.isArray(snap.recentLog) && snap.recentLog.length > 0) {
+      const existing = await setsAll();
+      const existingKeys = new Set(existing.map(s =>
+        `${s.date}|${s.exercise}|${s.setNum || 1}`));
+      const db = await openDB();
+      const store = db.transaction("sets", "readwrite").objectStore("sets");
+      for (const r of snap.recentLog) {
+        if (!r.date || !r.exercise) continue;
+        const setNum = r.setNum || 1;
+        const key = `${r.date}|${r.exercise}|${setNum}`;
+        if (existingKeys.has(key)) continue;
+        store.add({
+          date: r.date,
+          workoutName: r.workoutName || "",
+          exercise: r.exercise,
+          setNum: setNum,
+          reps: r.reps || 0,
+          weight: r.weight || 0,
+          rpe: r.rpe || null,
+          notes: r.notes || "",
+          synced: 1,           // already in the workbook
+          fromSnapshot: 1,     // distinguish from PWA-logged entries
+          loggedAt: new Date(r.date + "T12:00:00").getTime(),
+        });
+        existingKeys.add(key);
+        imported++;
+      }
+    }
+
     await loadSnapshot();
-    toast("Snapshot loaded");
+    await precomputeBests();
+    if (imported > 0) {
+      toast(`Snapshot loaded · ${imported} historical sets imported`);
+    } else {
+      toast("Snapshot loaded · history already up to date");
+    }
+    await refreshSettingsCounts();
   } catch (err) { toast("Bad snapshot: " + err.message); }
   e.target.value = "";
 });
