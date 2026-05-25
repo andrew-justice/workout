@@ -944,6 +944,15 @@ hr.rule { border:none; border-top:1.5px solid var(--ink); margin:24px 0 12px; }
       <div class="small muted" id="snapshot-detail">No snapshot loaded.</div>
     </div>
     <div class="card">
+      <div class="label">Workout Plans</div>
+      <p class="small">Import a <span class="kbd">pwa_plans_*.json</span> file directly. Adds new plans, replaces existing ones, removes any with a <span class="kbd">null</span> value. Your library stays intact.</p>
+      <label class="file-pick">Import plans JSON
+        <input type="file" id="plans-file" accept=".json,application/json" />
+      </label>
+      <div class="spacer" style="height:8px"></div>
+      <div class="small muted" id="plans-detail">— plans stored locally.</div>
+    </div>
+    <div class="card">
       <div class="label">Export logged sets</div>
       <p class="small">Generates a CSV of every set you've logged in this PWA. Save it to your OneDrive <span class="kbd">pwa_inbox/</span> folder. Your desktop sync tool will pull it into the workbook.</p>
       <button class="btn outline" id="btn-export-all">Export all sets → CSV</button>
@@ -1774,6 +1783,15 @@ async function refreshSettingsCounts() {
   const all = await setsAll();
   const unsynced = all.filter(s => !s.synced).length;
   $("#export-detail").textContent = `${all.length} sets stored locally · ${unsynced} un-synced`;
+  const pe = state.planEdits;
+  if (pe) {
+    const liveNames = Object.entries(pe).filter(([,v]) => v !== null).map(([n]) => n);
+    const pCount = liveNames.length;
+    const dCount = liveNames.reduce((acc, n) => acc + Object.keys(pe[n] || {}).length, 0);
+    const el = $("#plans-detail");
+    if (el) el.textContent =
+      `${pCount} plan${pCount===1?"":"s"} · ${dCount} day${dCount===1?"":"s"} stored locally.`;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -2682,6 +2700,57 @@ $("#snapshot-file").addEventListener("change", async (e) => {
     }
     await refreshSettingsCounts();
   } catch (err) { toast("Bad snapshot: " + err.message); }
+  e.target.value = "";
+});
+
+$("#plans-file").addEventListener("change", async (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const text = await f.text();
+    const payload = JSON.parse(text);
+    if (!payload || typeof payload !== "object" || !payload.plans
+        || typeof payload.plans !== "object") {
+      throw new Error("missing 'plans' field");
+    }
+    await loadPlanEdits(); // make sure state.planEdits is populated
+    let added = 0, updated = 0, deleted = 0, skipped = 0;
+    for (const [name, days] of Object.entries(payload.plans)) {
+      const existed = state.planEdits[name] !== undefined
+                   && state.planEdits[name] !== null;
+      if (days === null) {
+        // Deletion signal — only counts if it was actually there
+        if (existed) { delete state.planEdits[name]; deleted++; }
+        continue;
+      }
+      // Light validation: must be an object with at least one day → array
+      if (typeof days !== "object" || Array.isArray(days)) { skipped++; continue; }
+      const validDays = {};
+      for (const [d, exes] of Object.entries(days)) {
+        if (Array.isArray(exes)) validDays[d] = exes;
+      }
+      if (Object.keys(validDays).length === 0) { skipped++; continue; }
+      state.planEdits[name] = validDays;
+      if (existed) updated++; else added++;
+    }
+    await savePlanEdits();
+    // If the user is currently viewing the editor, refresh it
+    if (state.view === "plans") {
+      // Pick a sensible active plan if the current one was just deleted
+      if (state.peActivePlan && !state.planEdits[state.peActivePlan]) {
+        state.peActivePlan = Object.keys(state.planEdits)[0] || null;
+      }
+      renderPlanEditor();
+    }
+    const parts = [];
+    if (added)   parts.push(`${added} added`);
+    if (updated) parts.push(`${updated} updated`);
+    if (deleted) parts.push(`${deleted} deleted`);
+    if (skipped) parts.push(`${skipped} skipped`);
+    toast(parts.length ? `Plans imported · ${parts.join(", ")}` : "No changes to apply");
+    refreshSettingsCounts();
+  } catch (err) {
+    toast("Bad plans file: " + err.message);
+  }
   e.target.value = "";
 });
 $("#btn-export-all").addEventListener("click", () => exportAllSets(false));
