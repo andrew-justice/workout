@@ -404,10 +404,9 @@ input[type="file"] { display:none; }
 /* Custom autocomplete (replaces iOS-flaky <datalist>) */
 .ac-wrap { position:relative; }
 .ac-list {
-  position:absolute; left:0; right:0; top:100%;
-  background:var(--paper); border:1.5px solid var(--ink); border-top:none;
-  border-radius:0 0 var(--radius) var(--radius);
-  max-height:260px; overflow-y:auto; z-index:50;
+  position:absolute; left:0; right:0;
+  background:var(--paper); border:1.5px solid var(--ink);
+  max-height:260px; overflow-y:auto; z-index:9999;
   box-shadow:0 8px 24px var(--shadow);
   display:none;
 }
@@ -1341,6 +1340,33 @@ function attachAutocomplete(inputRef, listRef, getLibrary) {
   if (!input || !list) return;
   let highlighted = -1;
 
+  function positionList() {
+    /* Flip the dropdown above the input if there isn't enough room below
+       (e.g. iOS keyboard is visible). Uses visualViewport when available
+       so the measurement accounts for the software keyboard height. */
+    const rect = input.getBoundingClientRect();
+    const vh = (window.visualViewport ? window.visualViewport.height : window.innerHeight);
+    const spaceBelow = vh - rect.bottom - 8;
+    const spaceAbove = rect.top - 8;
+    const flip = spaceBelow < 200 && spaceAbove > spaceBelow;
+    const maxH = Math.min(260, flip ? spaceAbove : spaceBelow);
+
+    if (flip) {
+      list.style.top = ""; list.style.bottom = "100%";
+      list.style.borderTop = "1.5px solid var(--ink)";
+      list.style.borderBottom = "none";
+      list.style.borderRadius =
+        "var(--radius) var(--radius) 0 0";
+    } else {
+      list.style.top = "100%"; list.style.bottom = "";
+      list.style.borderTop = "none";
+      list.style.borderBottom = "1.5px solid var(--ink)";
+      list.style.borderRadius =
+        "0 0 var(--radius) var(--radius)";
+    }
+    list.style.maxHeight = Math.max(120, maxH) + "px";
+  }
+
   function render(query) {
     const items = getLibrary() || [];
     const q = (query || "").trim().toLowerCase();
@@ -1348,7 +1374,6 @@ function attachAutocomplete(inputRef, listRef, getLibrary) {
     if (!q) {
       matches = items.slice(0, 50);
     } else {
-      // Score: starts-with > contains > word-start
       const scored = items.map(it => {
         const n = it.name.toLowerCase();
         let score = -1;
@@ -1362,9 +1387,11 @@ function attachAutocomplete(inputRef, listRef, getLibrary) {
     }
 
     list.innerHTML = "";
+    positionList();
+
     if (matches.length === 0) {
       list.appendChild(el("div", { class: "ac-empty" },
-        q ? `No matches for "${q}" — tap Add to use anyway` : "Library is empty"));
+        q ? `No matches for "${q}" — tap Add to use anyway` : "Library is empty — import a snapshot first"));
       list.classList.add("open");
       highlighted = -1;
       return;
@@ -1373,7 +1400,6 @@ function attachAutocomplete(inputRef, listRef, getLibrary) {
       const node = el("div", { class: "ac-item",
         onclick: (e) => { e.preventDefault(); pick(it.name); },
       });
-      // Highlight matched substring
       const idx = q ? it.name.toLowerCase().indexOf(q) : -1;
       if (idx >= 0 && q) {
         node.appendChild(document.createTextNode(it.name.slice(0, idx)));
