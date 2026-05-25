@@ -1131,32 +1131,58 @@ function renderSnapshotStatus() {
   $("#snapshot-detail").textContent = `Last imported: ${gen.toLocaleString()} — ${libCount} exercises, ${planCount} plans, ${dayCount} days, ${(s.recentLog||[]).length} historical sets.`;
 }
 
+function getActivePlans() {
+  /* planEdits is the single source of truth for plans in the PWA.
+     It is seeded from snapshot on first open and holds all local edits.
+     Falls back to snapshot.plans if planEdits hasn't been loaded yet. */
+  if (state.planEdits) {
+    const result = {};
+    for (const [name, days] of Object.entries(state.planEdits)) {
+      if (days !== null && typeof days === "object") result[name] = days;
+    }
+    if (Object.keys(result).length > 0) return result;
+  }
+  return state.snapshot?.plans || {};
+}
+
 function openPickPlan() {
-  if (!state.snapshot) { toast("Import a snapshot first (Settings)"); showView("settings"); return; }
+  const plans = getActivePlans();
+  const hasPlan = Object.keys(plans).length > 0;
+  if (!hasPlan) {
+    toast("No plans yet — create one in the Plans tab or import a snapshot");
+    showView("plans");
+    renderPlanEditor();
+    return;
+  }
   const list = $("#plan-list"); list.innerHTML = "";
-  const plans = Object.entries(state.snapshot.plans);
-  if (plans.length === 0) list.appendChild(el("p", { class: "muted small" }, "No plans in your snapshot."));
-  for (const [name, days] of plans) {
+  for (const [name, days] of Object.entries(plans)) {
+    const dayCount = Object.keys(days || {}).length;
     list.appendChild(el("button", {
-      class: "option", onclick: () => openPickDay(name),
-    }, name, el("span", { class: "meta" }, `${Object.keys(days).length} days`)));
+      class: "option", onclick: () => openPickDay(name, plans),
+    }, name, el("span", { class: "meta" }, `${dayCount} day${dayCount !== 1 ? "s" : ""}`)));
   }
   showView("pick-plan");
 }
-function openPickDay(planName) {
+
+function openPickDay(planName, plans) {
+  const activePlans = plans || getActivePlans();
+  const days = activePlans[planName] || {};
   $("#pick-day-sub").textContent = planName;
   const list = $("#day-list"); list.innerHTML = "";
-  for (const [name, exercises] of Object.entries(state.snapshot.plans[planName])) {
+  for (const [name, exercises] of Object.entries(days)) {
+    const exArr = Array.isArray(exercises) ? exercises : [];
     list.appendChild(el("button", {
-      class: "option", onclick: () => startSession(planName, name),
-    }, name, el("span", { class: "meta" }, `${exercises.length} ex`)));
+      class: "option", onclick: () => startSession(planName, name, activePlans),
+    }, name, el("span", { class: "meta" }, `${exArr.length} ex`)));
   }
   showView("pick-day");
 }
 
-function startSession(planName, dayName) {
+function startSession(planName, dayName, plans) {
+  const activePlans = plans || getActivePlans();
+  const dayExercises = (activePlans[planName] || {})[dayName] || [];
   const today = new Date().toISOString().slice(0,10);
-  const exercises = state.snapshot.plans[planName][dayName].map(e => ({
+  const exercises = dayExercises.map(e => ({
     ...e, sets: buildSets(e.targetSets), open: false,
   }));
   if (exercises.length > 0) exercises[0].open = true;
@@ -2746,10 +2772,10 @@ $("#bw-input").addEventListener("keydown", (e) => {
 (async () => {
   await loadSettings();
   await loadSnapshot();
+  await loadPlanEdits();        // plans available before user taps Start
   await loadActiveSession();
   await renderBodyWeightStatus();
   await precomputeBests();
-  // Attach autocompletes — they read from state.snapshot.library lazily
   const getLib = () => state.snapshot?.library || [];
   attachAutocomplete("add-ex-name", "add-ex-ac", getLib);
   attachAutocomplete("ql-exercise", "ql-ac", getLib);
