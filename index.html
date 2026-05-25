@@ -383,6 +383,188 @@ input[type="file"] { display:none; }
   padding:14px; color:var(--muted); font-size:13px;
   text-align:center; font-style:italic;
 }
+
+/* ───── Coach view ───── */
+.coach-section {
+  margin-bottom:22px;
+}
+.coach-section h3 {
+  font-family:var(--font-display); font-size:16px;
+  letter-spacing:0.12em; text-transform:uppercase;
+  margin:0 0 10px; padding-bottom:6px;
+  border-bottom:1.5px solid var(--ink); color:var(--ink);
+}
+.coach-section h3 .right {
+  float:right; font-family:var(--font-mono); font-size:10px;
+  color:var(--muted); letter-spacing:0.08em; font-weight:400;
+}
+
+/* Pulse — KPI tiles */
+.pulse {
+  display:grid; grid-template-columns:1fr 1fr; gap:8px;
+}
+.pulse-tile {
+  background:#FCFAF2; border:1.5px solid var(--ink);
+  border-radius:var(--radius); padding:12px 14px;
+  position:relative;
+}
+.pulse-tile .label {
+  font-size:10px; letter-spacing:0.14em; text-transform:uppercase;
+  color:var(--muted); font-weight:700; margin-bottom:4px;
+}
+.pulse-tile .value {
+  font-family:var(--font-display); font-size:28px;
+  letter-spacing:0.02em; line-height:1; color:var(--ink);
+}
+.pulse-tile .sub {
+  font-family:var(--font-mono); font-size:10px;
+  color:var(--muted); margin-top:4px;
+}
+.pulse-tile.accent { background:var(--accent-soft); border-color:var(--accent); }
+.pulse-tile.accent .value { color:var(--accent); }
+
+/* Coach hints */
+.hint {
+  padding:10px 12px; margin-bottom:6px;
+  background:#FCFAF2; border-left:3px solid var(--muted);
+  border-radius:0 var(--radius) var(--radius) 0;
+  font-size:13px; line-height:1.4;
+}
+.hint.up    { border-left-color:var(--success); }
+.hint.down  { border-left-color:var(--danger);  background:#FDF4F4; }
+.hint.stall { border-left-color:var(--accent);  background:var(--accent-soft); }
+.hint .tag {
+  font-family:var(--font-mono); font-size:10px; font-weight:700;
+  letter-spacing:0.1em; margin-right:8px; text-transform:uppercase;
+}
+.hint.up .tag    { color:var(--success); }
+.hint.down .tag  { color:var(--danger); }
+.hint.stall .tag { color:var(--accent); }
+
+/* Recent sessions list */
+.coach-session {
+  background:#FCFAF2; border:1.5px solid var(--line);
+  border-radius:var(--radius); padding:10px 12px;
+  margin-bottom:6px; display:grid;
+  grid-template-columns:1fr auto; gap:4px 12px;
+}
+.coach-session .date {
+  font-family:var(--font-display); font-size:16px;
+  letter-spacing:0.04em;
+}
+.coach-session .name {
+  font-size:12px; color:var(--muted);
+  grid-column:1 / 2;
+}
+.coach-session .stats {
+  grid-column:2 / 3; grid-row:1 / 3;
+  text-align:right;
+  font-family:var(--font-mono); font-size:11px; color:var(--ink-soft);
+  line-height:1.5;
+}
+.coach-session .stats b { color:var(--ink); }
+
+/* PR ranking */
+.pr-list { background:#FCFAF2; border:1.5px solid var(--line); border-radius:var(--radius); }
+.pr-row {
+  display:grid; grid-template-columns:28px 1fr auto auto;
+  gap:8px; padding:8px 12px; align-items:center;
+  border-bottom:1px dashed var(--line);
+}
+.pr-row:last-child { border-bottom:none; }
+.pr-row .rank {
+  font-family:var(--font-mono); font-size:11px; font-weight:700;
+  color:var(--muted); text-align:center;
+}
+.pr-row .ex { font-size:13px; font-weight:600; }
+.pr-row .e1 {
+  font-family:var(--font-mono); font-size:14px; font-weight:700;
+  color:var(--accent);
+}
+.pr-row .date {
+  font-family:var(--font-mono); font-size:10px; color:var(--muted);
+}
+.pr-row.top { background:var(--accent-soft); }
+
+/* Exercise trend rows */
+.trend-row {
+  display:grid; grid-template-columns:1fr 100px;
+  gap:10px; padding:8px 0; align-items:center;
+  border-bottom:1px dashed var(--line);
+}
+.trend-row:last-child { border-bottom:none; }
+.trend-row .name { font-size:13px; font-weight:600; }
+.trend-row .meta {
+  font-family:var(--font-mono); font-size:11px; color:var(--muted);
+}
+.trend-row .e1 { color:var(--accent); font-weight:700; }
+.trend-row svg { width:100px; height:36px; display:block; }
+
+/* Muscle balance bars */
+.muscle-row {
+  display:grid; grid-template-columns:80px 1fr 56px;
+  gap:8px; padding:6px 0; align-items:center;
+}
+.muscle-row .label {
+  font-family:var(--font-mono); font-size:11px;
+  letter-spacing:0.08em; text-transform:uppercase;
+  color:var(--ink-soft);
+}
+.muscle-row .bar-track {
+  height:14px; background:var(--paper-2);
+  border:1px solid var(--line); border-radius:2px;
+  position:relative; overflow:hidden;
+}
+.muscle-row .bar-fill {
+  height:100%; background:var(--accent);
+  transition:width .3s ease;
+}
+.muscle-row .value {
+  font-family:var(--font-mono); font-size:11px;
+  text-align:right; color:var(--ink); font-weight:700;
+}
+
+/* Heatmap */
+.heatmap {
+  background:#FCFAF2; padding:12px;
+  border:1.5px solid var(--line); border-radius:var(--radius);
+}
+.heatmap-grid {
+  display:grid; grid-template-columns:18px repeat(7, 1fr);
+  gap:3px; align-items:center;
+}
+.heatmap-grid .col-label {
+  font-family:var(--font-mono); font-size:9px;
+  color:var(--muted); text-align:center;
+}
+.heatmap-grid .row-label {
+  font-family:var(--font-mono); font-size:9px;
+  color:var(--muted); text-align:right; padding-right:4px;
+}
+.heatmap-cell {
+  aspect-ratio:1; border-radius:2px;
+  background:var(--paper-2); border:1px solid transparent;
+  position:relative;
+}
+.heatmap-cell.l1 { background:#F5E6D6; }
+.heatmap-cell.l2 { background:#F0C9A0; }
+.heatmap-cell.l3 { background:#E08A50; }
+.heatmap-cell.l4 { background:var(--accent); }
+.heatmap-cell.today { border-color:var(--ink); border-width:2px; }
+.heatmap-legend {
+  display:flex; gap:4px; align-items:center; justify-content:flex-end;
+  margin-top:8px; font-family:var(--font-mono); font-size:9px; color:var(--muted);
+}
+.heatmap-legend .swatch {
+  width:10px; height:10px; border-radius:2px;
+}
+
+.coach-empty {
+  padding:30px 16px; text-align:center;
+  color:var(--muted); font-style:italic; font-size:13px;
+  background:#FCFAF2; border:1.5px dashed var(--line);
+  border-radius:var(--radius);
+}
 .muted { color:var(--muted); }
 .small { font-size:12px; }
 .spacer { height:24px; }
@@ -403,6 +585,7 @@ hr.rule { border:none; border-top:1.5px solid var(--ink); margin:24px 0 12px; }
     <nav>
       <button data-view="home" class="active">Home</button>
       <button data-view="history">Log</button>
+      <button data-view="coach">Coach</button>
       <button data-view="settings">≡</button>
     </nav>
   </header>
@@ -510,6 +693,15 @@ hr.rule { border:none; border-top:1.5px solid var(--ink); margin:24px 0 12px; }
     <hr class="rule" />
     <button class="btn accent" id="ql-save">Save to History</button>
     <button class="btn outline" data-view="home">Cancel</button>
+  </section>
+
+  <section class="view" id="view-coach">
+    <h1 class="page-title">Training <em>Partner</em></h1>
+    <p class="subtitle" id="coach-subtitle">—</p>
+    <div id="coach-body">
+      <!-- Sections render here on demand via renderCoach() -->
+    </div>
+    <button class="btn outline" data-view="home">Back</button>
   </section>
 
   <section class="view" id="view-history">
@@ -762,6 +954,7 @@ function showView(name) {
   state.view = name;
   window.scrollTo(0, 0);
   if (name === "history") renderHistory();
+  if (name === "coach") renderCoach();
   if (name === "settings") refreshSettingsCounts();
   if (name === "quick-log") { if (!state._ql) state._ql = { sets: [{reps:"",weight:"",rpe:"",done:false}] }; renderQuickLog(); }
 }
@@ -1379,6 +1572,442 @@ async function refreshSettingsCounts() {
   const all = await setsAll();
   const unsynced = all.filter(s => !s.synced).length;
   $("#export-detail").textContent = `${all.length} sets stored locally · ${unsynced} un-synced`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   COACH VIEW — training partner / in-PWA dashboard
+   Pulls everything from IndexedDB (which is seeded from the snapshot
+   plus PWA-logged sets). Renders 7 sections optimized for a phone:
+     1. Pulse (KPI tiles for this week)
+     2. Coach hints (rule-based suggestions)
+     3. Recent sessions (last 4)
+     4. Personal records (top 8 by e1RM)
+     5. Exercise trends (top 5 lifts by frequency, with sparklines)
+     6. Muscle balance (weekly volume by primary muscle group)
+     7. Consistency heatmap (8 weeks × 7 days)
+   ═══════════════════════════════════════════════════════════════ */
+async function renderCoach() {
+  const body = $("#coach-body");
+  body.innerHTML = "";
+
+  const all = await setsAll();
+  if (all.length === 0) {
+    $("#coach-subtitle").textContent = "—";
+    body.appendChild(el("div", { class: "coach-empty" },
+      "No data yet. Log a session or import a snapshot, then come back."));
+    return;
+  }
+
+  // Normalize to plain objects keyed by Date object for math
+  const sets = all.map(s => ({
+    ...s,
+    _date: new Date(s.date + "T12:00:00"),
+    _e1: computeE1RM(s.weight, s.reps),
+    _vol: (parseFloat(s.weight)||0) * (parseFloat(s.reps)||0),
+  })).sort((a, b) => a._date - b._date);
+
+  const uniqueDates = [...new Set(sets.map(s => s.date))];
+  $("#coach-subtitle").textContent =
+    `${sets.length} sets · ${uniqueDates.length} sessions in your local history.`;
+
+  body.appendChild(coachPulse(sets));
+  body.appendChild(coachHints(sets));
+  body.appendChild(coachRecentSessions(sets));
+  body.appendChild(coachTopPRs(sets));
+  body.appendChild(coachExerciseTrends(sets));
+  body.appendChild(coachMuscleBalance(sets));
+  body.appendChild(coachHeatmap(sets));
+}
+
+function _section(title, rightLabel) {
+  const sec = el("div", { class: "coach-section" });
+  const h = el("h3", {}, title);
+  if (rightLabel) {
+    const r = document.createElement("span");
+    r.className = "right";
+    r.textContent = rightLabel;
+    h.appendChild(r);
+  }
+  sec.appendChild(h);
+  return sec;
+}
+
+function _weekStart(d) {
+  const dd = new Date(d);
+  const day = (dd.getDay() + 6) % 7; // Monday = 0
+  dd.setDate(dd.getDate() - day);
+  dd.setHours(0, 0, 0, 0);
+  return dd;
+}
+
+/* ── 1. Pulse ───────────────────────────────────────────────────── */
+function coachPulse(sets) {
+  const sec = _section("Pulse", "this week");
+  const grid = el("div", { class: "pulse" });
+
+  const now = new Date();
+  const weekStart = _weekStart(now);
+  const lastWeekStart = new Date(weekStart); lastWeekStart.setDate(lastWeekStart.getDate() - 7);
+
+  const thisWeek = sets.filter(s => s._date >= weekStart);
+  const lastWeek = sets.filter(s => s._date >= lastWeekStart && s._date < weekStart);
+
+  const sessionsThis = new Set(thisWeek.map(s => s.date)).size;
+  const sessionsLast = new Set(lastWeek.map(s => s.date)).size;
+  const volThis = thisWeek.reduce((a, s) => a + s._vol, 0);
+  const volLast = lastWeek.reduce((a, s) => a + s._vol, 0);
+
+  const last = sets[sets.length - 1];
+  const daysSinceLast = Math.floor((now - last._date) / 86400000);
+
+  // Streak: count consecutive weeks (Mon-Sun) with ≥1 session, working back
+  let streak = 0;
+  let cursor = new Date(weekStart);
+  // include this week if any
+  if (sessionsThis > 0) streak = 1;
+  while (true) {
+    const prevStart = new Date(cursor); prevStart.setDate(prevStart.getDate() - 7);
+    const inThatWeek = sets.some(s => s._date >= prevStart && s._date < cursor);
+    if (inThatWeek) { streak++; cursor = prevStart; }
+    else break;
+    if (streak > 99) break;
+  }
+
+  grid.appendChild(_tile("Sessions", sessionsThis,
+    sessionsLast > 0 ? `vs ${sessionsLast} last week` : "first week"));
+  grid.appendChild(_tile("Volume",
+    volThis >= 1000 ? (volThis/1000).toFixed(1) + "k" : Math.round(volThis),
+    "lbs total", true));
+  grid.appendChild(_tile("Days since last",
+    daysSinceLast, daysSinceLast === 0 ? "today" : daysSinceLast === 1 ? "yesterday" : "days ago"));
+  grid.appendChild(_tile("Active streak", streak, streak === 1 ? "week" : "weeks"));
+
+  sec.appendChild(grid);
+  return sec;
+}
+
+function _tile(label, value, sub, accent) {
+  const t = el("div", { class: "pulse-tile" + (accent ? " accent" : "") });
+  t.appendChild(el("div", { class: "label" }, label));
+  t.appendChild(el("div", { class: "value" }, String(value)));
+  if (sub) t.appendChild(el("div", { class: "sub" }, sub));
+  return t;
+}
+
+/* ── 2. Coach hints ─────────────────────────────────────────────── */
+function coachHints(sets) {
+  const sec = _section("Coach Notes");
+  const hints = computeHints(sets);
+  if (hints.length === 0) {
+    sec.appendChild(el("div", { class: "hint" }, "Steady. Nothing to flag."));
+    return sec;
+  }
+  for (const h of hints) {
+    const card = el("div", { class: "hint " + (h.kind || "") });
+    const tag = el("span", { class: "tag" }, h.tag);
+    card.appendChild(tag);
+    card.appendChild(document.createTextNode(h.text));
+    sec.appendChild(card);
+  }
+  return sec;
+}
+
+function computeHints(sets) {
+  const out = [];
+  if (sets.length < 4) return out;
+  const now = sets[sets.length - 1]._date;
+  const cutoffRecent = new Date(now); cutoffRecent.setDate(cutoffRecent.getDate() - 28);
+  const cutoffPrior = new Date(now); cutoffPrior.setDate(cutoffPrior.getDate() - 56);
+  const recent = sets.filter(s => s._date > cutoffRecent);
+  const prior = sets.filter(s => s._date > cutoffPrior && s._date <= cutoffRecent);
+  if (recent.length === 0) return [{kind:"down", tag:"WARN", text:"No sessions in the last 28 days."}];
+
+  const exs = [...new Set(recent.map(s => s.exercise))];
+  for (const ex of exs) {
+    const r = recent.filter(s => s.exercise === ex);
+    const p = prior.filter(s => s.exercise === ex);
+    if (r.length < 2 || p.length < 2) continue;
+    const rE1 = Math.max(0, ...r.map(s => s._e1));
+    const pE1 = Math.max(0, ...p.map(s => s._e1));
+    if (rE1 === 0 || pE1 === 0) continue;
+    const diff = rE1 - pE1;
+    if (diff > 5)
+      out.push({kind:"up", tag:"UP", text:`${ex}: e1RM up ${diff.toFixed(1)} lbs in 4 weeks. Keep adding load.`});
+    else if (diff < -10)
+      out.push({kind:"down", tag:"DOWN", text:`${ex}: e1RM down ${Math.abs(diff).toFixed(1)} lbs. Consider a deload.`});
+    else if (Math.abs(diff) <= 2) {
+      const rpes = r.map(s => parseFloat(s.rpe)).filter(x => !isNaN(x));
+      if (rpes.length > 0 && rpes.reduce((a,b)=>a+b,0)/rpes.length >= 8.5)
+        out.push({kind:"stall", tag:"STALL", text:`${ex}: flat e1RM with high RPE. Try a small deload or volume cut.`});
+    }
+  }
+
+  const rVol = recent.reduce((a, s) => a + s._vol, 0);
+  const pVol = prior.reduce((a, s) => a + s._vol, 0);
+  if (pVol > 0) {
+    const change = (rVol - pVol) / pVol * 100;
+    if (change > 25)
+      out.push({kind:"down", tag:"WARN", text:`Total volume up ${change.toFixed(0)}% — watch for overreach.`});
+    else if (change < -25)
+      out.push({kind:"down", tag:"WARN", text:`Total volume down ${Math.abs(change).toFixed(0)}% — back on the wagon.`});
+  }
+
+  return out.slice(0, 6);
+}
+
+/* ── 3. Recent sessions ────────────────────────────────────────── */
+function coachRecentSessions(sets) {
+  const sec = _section("Recent Sessions", "last 4");
+  const byDate = {};
+  for (const s of sets) (byDate[s.date] ||= []).push(s);
+  const dates = Object.keys(byDate).sort().reverse().slice(0, 4);
+  for (const d of dates) {
+    const group = byDate[d];
+    const name = group[0].workoutName || "Session";
+    const vol = group.reduce((a,s) => a + s._vol, 0);
+    const topE1 = Math.max(0, ...group.map(s => s._e1));
+    const exCount = new Set(group.map(s => s.exercise)).size;
+    const card = el("div", { class: "coach-session" });
+    card.appendChild(el("div", { class: "date" }, formatDateNice(d)));
+    card.appendChild(el("div", { class: "name" }, name));
+    const stats = el("div", { class: "stats" });
+    stats.innerHTML =
+      `<b>${group.length}</b> sets · <b>${exCount}</b> ex<br>` +
+      `vol <b>${Math.round(vol).toLocaleString()}</b>` +
+      (topE1 > 0 ? `<br>top e1RM <b>${topE1.toFixed(0)}</b>` : "");
+    card.appendChild(stats);
+    sec.appendChild(card);
+  }
+  return sec;
+}
+
+/* ── 4. Personal Records ───────────────────────────────────────── */
+function coachTopPRs(sets) {
+  const sec = _section("Personal Records", "top 8 by e1RM");
+  const best = {};
+  for (const s of sets) {
+    if (s._e1 <= 0) continue;
+    if (!best[s.exercise] || s._e1 > best[s.exercise]._e1) {
+      best[s.exercise] = s;
+    }
+  }
+  const ranked = Object.entries(best)
+    .map(([ex, s]) => ({ exercise: ex, ...s }))
+    .sort((a,b) => b._e1 - a._e1)
+    .slice(0, 8);
+  if (ranked.length === 0) {
+    sec.appendChild(el("div", { class: "coach-empty" }, "No PRs computed yet."));
+    return sec;
+  }
+  const list = el("div", { class: "pr-list" });
+  ranked.forEach((r, i) => {
+    const row = el("div", { class: "pr-row" + (i < 3 ? " top" : "") });
+    row.appendChild(el("div", { class: "rank" }, "#" + (i + 1)));
+    row.appendChild(el("div", { class: "ex" }, r.exercise));
+    row.appendChild(el("div", { class: "e1" }, r._e1.toFixed(0)));
+    row.appendChild(el("div", { class: "date" }, r.date.slice(5).replace("-","/")));
+    list.appendChild(row);
+  });
+  sec.appendChild(list);
+  return sec;
+}
+
+/* ── 5. Exercise trends (sparklines) ───────────────────────────── */
+function coachExerciseTrends(sets) {
+  const sec = _section("Exercise Trends", "top 5 by frequency");
+  // Count frequency over last 56 days for "what you're actually training"
+  const now = sets[sets.length - 1]._date;
+  const cutoff = new Date(now); cutoff.setDate(cutoff.getDate() - 56);
+  const recent = sets.filter(s => s._date >= cutoff);
+  const freq = {};
+  for (const s of recent) freq[s.exercise] = (freq[s.exercise] || 0) + 1;
+  const top = Object.entries(freq).sort((a,b) => b[1] - a[1]).slice(0, 5).map(x => x[0]);
+
+  if (top.length === 0) {
+    sec.appendChild(el("div", { class: "coach-empty" }, "No recent exercises tracked."));
+    return sec;
+  }
+  for (const ex of top) {
+    const exSets = sets.filter(s => s.exercise === ex && s._e1 > 0);
+    const byDate = {};
+    for (const s of exSets) {
+      if (!byDate[s.date] || byDate[s.date] < s._e1) byDate[s.date] = s._e1;
+    }
+    const points = Object.entries(byDate).sort((a,b) => a[0].localeCompare(b[0])).slice(-8);
+    const current = points.length ? points[points.length-1][1] : 0;
+    const max = Math.max(0, ...points.map(p => p[1]));
+
+    const row = el("div", { class: "trend-row" });
+    const left = el("div");
+    left.appendChild(el("div", { class: "name" }, ex));
+    const meta = el("div", { class: "meta" });
+    meta.innerHTML = `current e1RM <span class="e1">${current.toFixed(0)}</span> · best ${max.toFixed(0)}`;
+    left.appendChild(meta);
+    row.appendChild(left);
+    row.appendChild(_miniSparkline(points));
+    sec.appendChild(row);
+  }
+  return sec;
+}
+
+function _miniSparkline(points) {
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("viewBox", "0 0 100 36");
+  svg.setAttribute("preserveAspectRatio", "none");
+  if (points.length === 0) return svg;
+  const styles = getComputedStyle(document.body);
+  const accent = styles.getPropertyValue("--accent").trim();
+  const muted = styles.getPropertyValue("--line").trim() || "#D8CFBA";
+
+  if (points.length === 1) {
+    const c = document.createElementNS(ns, "circle");
+    c.setAttribute("cx", "50"); c.setAttribute("cy", "18"); c.setAttribute("r", "3");
+    c.setAttribute("fill", accent);
+    svg.appendChild(c); return svg;
+  }
+  const vals = points.map(p => p[1]);
+  const min = Math.min(...vals), max = Math.max(...vals);
+  const range = (max - min) || 1;
+  const dx = 100 / (points.length - 1);
+  // baseline
+  const base = document.createElementNS(ns, "line");
+  base.setAttribute("x1","0"); base.setAttribute("x2","100");
+  base.setAttribute("y1","34"); base.setAttribute("y2","34");
+  base.setAttribute("stroke", muted); base.setAttribute("stroke-width","0.5");
+  svg.appendChild(base);
+  // line
+  const d = points.map((p, i) => {
+    const x = (i * dx).toFixed(1);
+    const y = (4 + 26 * (1 - (p[1] - min)/range)).toFixed(1);
+    return `${i===0?"M":"L"}${x},${y}`;
+  }).join(" ");
+  const path = document.createElementNS(ns, "path");
+  path.setAttribute("d", d); path.setAttribute("fill","none");
+  path.setAttribute("stroke", accent); path.setAttribute("stroke-width","1.5");
+  path.setAttribute("stroke-linejoin","round");
+  svg.appendChild(path);
+  // last dot
+  const last = points[points.length-1];
+  const lx = ((points.length-1) * dx).toFixed(1);
+  const ly = (4 + 26 * (1 - (last[1] - min)/range)).toFixed(1);
+  const dot = document.createElementNS(ns, "circle");
+  dot.setAttribute("cx", lx); dot.setAttribute("cy", ly); dot.setAttribute("r","2.5");
+  dot.setAttribute("fill", accent);
+  svg.appendChild(dot);
+  return svg;
+}
+
+/* ── 6. Muscle balance ─────────────────────────────────────────── */
+function coachMuscleBalance(sets) {
+  const sec = _section("Muscle Balance", "this week");
+  // Build exercise → primary muscle map from snapshot.library
+  const exMuscle = {};
+  if (state.snapshot?.library) {
+    for (const e of state.snapshot.library) {
+      exMuscle[e.name.toLowerCase()] = (e.primary || "Other").trim() || "Other";
+    }
+  }
+  const weekStart = _weekStart(new Date());
+  const thisWeek = sets.filter(s => s._date >= weekStart);
+  if (thisWeek.length === 0) {
+    sec.appendChild(el("div", { class: "coach-empty" }, "No sets this week yet."));
+    return sec;
+  }
+  const byMuscle = {};
+  for (const s of thisWeek) {
+    const m = exMuscle[s.exercise.toLowerCase()] || _guessMuscle(s.exercise);
+    byMuscle[m] = (byMuscle[m] || 0) + s._vol;
+  }
+  const entries = Object.entries(byMuscle).sort((a,b) => b[1] - a[1]);
+  if (entries.length === 0) {
+    sec.appendChild(el("div", { class: "coach-empty" }, "No muscle data."));
+    return sec;
+  }
+  const maxV = entries[0][1] || 1;
+  for (const [muscle, vol] of entries) {
+    const row = el("div", { class: "muscle-row" });
+    row.appendChild(el("div", { class: "label" }, muscle));
+    const track = el("div", { class: "bar-track" });
+    const fill = el("div", { class: "bar-fill" });
+    fill.style.width = `${(vol / maxV * 100).toFixed(1)}%`;
+    track.appendChild(fill);
+    row.appendChild(track);
+    row.appendChild(el("div", { class: "value" }, Math.round(vol).toLocaleString()));
+    sec.appendChild(row);
+  }
+  return sec;
+}
+
+function _guessMuscle(name) {
+  const n = name.toLowerCase();
+  // Most-specific patterns first so generic ones don't steal the match
+  if (/(plank|crunch|leg raise|ab |rollout|swing|hollow)/.test(n)) return "Core";
+  if (/(romanian|rdl|good morning)/.test(n)) return "Legs";
+  if (/(bench|chest|fly|dip|push.up)/.test(n)) return "Chest";
+  if (/(row|pull.up|lat |chin|deadlift|pulldown|face pull)/.test(n)) return "Back";
+  if (/(squat|leg press|lunge|leg extension|leg curl|hip thrust|calf)/.test(n)) return "Legs";
+  if (/(press|shoulder|lateral|overhead|raise)/.test(n)) return "Shoulders";
+  if (/(curl|tricep|skull|extension)/.test(n)) return "Arms";
+  return "Other";
+}
+
+/* ── 7. Consistency heatmap ────────────────────────────────────── */
+function coachHeatmap(sets) {
+  const sec = _section("Consistency", "last 8 weeks");
+  // Build a map: date string -> total volume
+  const byDate = {};
+  for (const s of sets) byDate[s.date] = (byDate[s.date] || 0) + s._vol;
+  const vols = Object.values(byDate).filter(v => v > 0);
+  if (vols.length === 0) {
+    sec.appendChild(el("div", { class: "coach-empty" }, "No data yet."));
+    return sec;
+  }
+  vols.sort((a,b) => a - b);
+  // Quartile thresholds
+  const q = (frac) => vols[Math.floor(vols.length * frac)];
+  const q1 = q(0.25), q2 = q(0.5), q3 = q(0.75);
+
+  const wrap = el("div", { class: "heatmap" });
+  const grid = el("div", { class: "heatmap-grid" });
+  // Header row
+  grid.appendChild(el("div", { class: "row-label" }, ""));
+  ["M","T","W","T","F","S","S"].forEach(d => grid.appendChild(el("div", { class: "col-label" }, d)));
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayStr = today.toISOString().slice(0,10);
+  const currentWeekStart = _weekStart(today);
+
+  for (let weekBack = 0; weekBack < 8; weekBack++) {
+    const wStart = new Date(currentWeekStart);
+    wStart.setDate(wStart.getDate() - weekBack * 7);
+    const label = wStart.toISOString().slice(5,10).replace("-","/");
+    grid.appendChild(el("div", { class: "row-label" }, label));
+    for (let dow = 0; dow < 7; dow++) {
+      const d = new Date(wStart); d.setDate(d.getDate() + dow);
+      const dStr = d.toISOString().slice(0,10);
+      const vol = byDate[dStr] || 0;
+      let cls = "heatmap-cell";
+      if (vol > 0) {
+        if (vol >= q3) cls += " l4";
+        else if (vol >= q2) cls += " l3";
+        else if (vol >= q1) cls += " l2";
+        else cls += " l1";
+      }
+      if (dStr === todayStr) cls += " today";
+      grid.appendChild(el("div", { class: cls, title: `${dStr}: ${Math.round(vol)} lbs` }));
+    }
+  }
+  wrap.appendChild(grid);
+  const legend = el("div", { class: "heatmap-legend" });
+  legend.appendChild(el("span", {}, "less"));
+  ["", "l1", "l2", "l3", "l4"].forEach(c => {
+    legend.appendChild(el("span", { class: "swatch heatmap-cell " + c }));
+  });
+  legend.appendChild(el("span", {}, "more"));
+  wrap.appendChild(legend);
+  sec.appendChild(wrap);
+  return sec;
 }
 
 async function renderHistory() {
