@@ -1,0 +1,1960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B2730">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Erg Race">
+<title>Erg Race</title>
+<link rel="manifest" href="erg-race.webmanifest">
+<link rel="apple-touch-icon" href="erg-race-icon-180.png">
+<link rel="icon" type="image/png" href="erg-race-icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --water: #0B2730;
+  --water-2: #123742;
+  --deep: #061A20;
+  --fog: #8AA6AC;
+  --bone: #EEE8DC;
+  --signal: #FFD23F;
+  --coral: #FF5B4A;
+  --display: "Big Shoulders Display", "Arial Narrow", "Helvetica Neue", sans-serif;
+  --body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--water); color: var(--bone); font-family: var(--body); -webkit-text-size-adjust: 100%; }
+body { overflow: hidden; -webkit-tap-highlight-color: transparent; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+button:disabled { cursor: default; opacity: 0.5; }
+:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; }
+[hidden] { display: none !important; }
+.screen { position: fixed; inset: 0; display: none; }
+.screen.on { display: block; }
+
+/* ---------- setup ---------- */
+#setup { overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: max(28px, env(safe-area-inset-top)) max(28px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(28px, env(safe-area-inset-left)); }
+.setup-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 72px); max-width: 1240px; margin: 0 auto; align-items: start; }
+.title { font-family: var(--display); font-weight: 900; font-size: clamp(72px, 11.5vw, 156px); line-height: 0.8; letter-spacing: -0.01em; margin: 0.06em 0 0.34em; }
+.lede { font-size: clamp(16px, 1.7vw, 19px); line-height: 1.5; color: var(--bone); max-width: 34em; margin: 0 0 28px; }
+.lede b { font-weight: 700; }
+.group { margin: 0 0 22px; }
+.glabel { display: block; font-weight: 700; font-size: 15px; color: var(--fog); margin: 0 0 9px; }
+.opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.opts button { font-family: var(--display); font-weight: 700; font-size: clamp(22px, 2.5vw, 28px); line-height: 1; padding: 11px 16px 10px; min-width: 56px;
+  border: 1.5px solid rgba(238, 232, 220, 0.28); border-radius: 2px; display: inline-flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.opts button small { font-family: var(--body); font-weight: 600; font-size: 12px; color: var(--fog); }
+.opts button[aria-checked="true"] { background: var(--signal); border-color: var(--signal); color: var(--deep); }
+.opts button[aria-checked="true"] small { color: rgba(6, 26, 32, 0.72); }
+.toggles { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 4px 0 26px; }
+.toggle { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; font-size: 16px; padding: 6px 0; }
+.toggle::before { content: ""; width: 20px; height: 20px; border: 1.5px solid rgba(238, 232, 220, 0.5); border-radius: 2px; flex: none; }
+.toggle[aria-pressed="true"]::before { background: var(--signal); border-color: var(--signal);
+  box-shadow: inset 0 0 0 4px var(--water); }
+.base { font-size: 15px; line-height: 1.5; color: var(--fog); margin: 0 0 22px; max-width: 34em; }
+.base button { color: var(--bone); text-decoration: underline; text-underline-offset: 3px; font-weight: 600; margin-left: 4px; }
+.primary { display: block; width: 100%; max-width: 460px; background: var(--signal); color: var(--deep); font-family: var(--display); font-weight: 800;
+  font-size: clamp(32px, 4vw, 46px); line-height: 1; padding: 18px 24px 16px; border-radius: 2px; text-align: left; }
+.primary:active { transform: translateY(1px); }
+.history { margin: 34px 0 0; }
+.history h2 { font-weight: 700; font-size: 15px; color: var(--fog); margin: 0 0 8px; }
+.history ol { list-style: none; margin: 0; padding: 0; font-size: 15px; line-height: 1.7; }
+.setup-cam { position: sticky; top: 0; }
+.preview { position: relative; width: 100%; aspect-ratio: 4 / 3; background: var(--deep); border: 1px solid rgba(238, 232, 220, 0.16); margin-top: 0.4em; }
+.preview-empty { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 24px; color: var(--fog); font-size: 15px; line-height: 1.5; }
+.cam-status { font-family: var(--display); font-weight: 700; font-size: clamp(22px, 2.6vw, 30px); line-height: 1.1; margin: 14px 0 6px; min-height: 1.1em; }
+.cam-status.quiet { font-family: var(--body); font-weight: 600; font-size: 15px; line-height: 1.5; color: var(--fog); }
+#trace { display: block; width: 100%; height: 56px; }
+.trace-cap { font-size: 13px; color: var(--fog); margin: 4px 0 14px; }
+.cam-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+.ghost { border: 1.5px solid rgba(238, 232, 220, 0.35); border-radius: 2px; padding: 10px 14px; font-weight: 700; font-size: 15px; }
+.tip { font-size: 15px; line-height: 1.55; color: var(--bone); max-width: 32em; margin: 0; }
+@media (max-width: 820px), (max-aspect-ratio: 1/1) {
+  .setup-grid { grid-template-columns: minmax(0, 1fr); }
+  .setup-cam { position: static; order: 2; max-width: 560px; }
+}
+
+/* camera dock: one video element, repositioned per screen */
+#camDock { position: fixed; z-index: 5; overflow: hidden; background: var(--deep); pointer-events: none; }
+#camDock video, #camDock canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+#camDock.mirror video, #camDock.mirror #heat { transform: scaleX(-1); }
+#camDock #heat { mix-blend-mode: screen; }
+#camDock.thumb { border: 1px solid rgba(238, 232, 220, 0.3); }
+#camDock.parked { left: 0 !important; top: 0 !important; width: 2px !important; height: 2px !important; opacity: 0; }
+#dockDot { position: absolute; right: 7px; top: 7px; width: 12px; height: 12px; border-radius: 50%; background: var(--coral); box-shadow: 0 0 0 2px var(--deep); display: none; }
+#camDock.thumb #dockDot { display: block; }
+#camDock.thumb.locked #dockDot { background: var(--signal); }
+
+/* ---------- race ---------- */
+#race { background: var(--water); }
+#scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hud { position: absolute; inset: 0; pointer-events: none;
+  --pad-t: max(18px, env(safe-area-inset-top)); --pad-r: max(22px, env(safe-area-inset-right));
+  --pad-b: max(16px, env(safe-area-inset-bottom)); --pad-l: max(22px, env(safe-area-inset-left)); }
+.gapbox { position: absolute; left: var(--pad-l); top: var(--pad-t); }
+.gapnum { font-family: var(--display); font-weight: 900; font-size: min(27vmin, 320px); line-height: 0.78; letter-spacing: -0.015em; color: var(--signal);
+  font-variant-numeric: tabular-nums; text-shadow: 0 2px 24px rgba(6, 26, 32, 0.6); }
+.gapnum.behind { color: var(--coral); }
+.gapnum.level { color: var(--bone); }
+.gaptxt { font-weight: 700; font-size: clamp(17px, 3.3vmin, 36px); margin-top: 1.4vmin; }
+.metrics { position: absolute; right: var(--pad-r); top: var(--pad-t); display: flex; gap: clamp(18px, 4.5vmin, 56px); text-align: right; }
+.metric .num { font-family: var(--display); font-weight: 800; font-size: min(12.5vmin, 148px); line-height: 0.8; font-variant-numeric: tabular-nums; }
+.metric .lbl { font-weight: 700; font-size: clamp(14px, 2.3vmin, 24px); color: var(--fog); margin-top: 1vmin; }
+.metric .num.pulse { color: var(--signal); }
+.status { position: absolute; left: 50%; transform: translateX(-50%); top: 36%; width: max-content; max-width: 88vw; text-align: center;
+  font-weight: 800; font-size: clamp(18px, 3.9vmin, 42px); line-height: 1.15; padding: 0.25em 0.6em; color: var(--bone); }
+.status:empty { display: none; }
+.status.attack, .status.bad { color: var(--deep); background: var(--coral); }
+.status.warn { color: var(--coral); }
+.status.good { color: var(--deep); background: var(--signal); }
+.status.info { color: var(--bone); background: rgba(6, 26, 32, 0.55); }
+.gauge { position: absolute; left: calc(var(--pad-l) + 4vmin); right: calc(var(--pad-r) + 4vmin); bottom: calc(var(--pad-b) + 50px + 5vmin); height: 0; }
+.gauge .track { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: rgba(238, 232, 220, 0.35); }
+.gauge .tick { position: absolute; top: -6px; width: 2px; height: 14px; background: rgba(238, 232, 220, 0.35); }
+.gauge .tick span { position: absolute; top: 18px; left: 50%; transform: translateX(-50%); font-size: clamp(11px, 1.7vmin, 16px); color: var(--fog); font-weight: 600; }
+.gauge .mk { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; font-family: var(--display); font-weight: 800; transition: left 0.35s ease-out; }
+.gauge .mk.you { bottom: 6px; top: auto; color: var(--signal); font-size: clamp(22px, 4.6vmin, 52px); line-height: 1; }
+.gauge .mk.you::after { content: ""; display: block; width: 0; height: 0; margin: 2px auto 0; border: 8px solid transparent; border-top-color: var(--signal); border-bottom: 0; }
+.gauge .mk.rival { top: 8px; color: var(--bone); font-size: clamp(16px, 2.9vmin, 32px); line-height: 1; }
+.gauge .mk.rival::before { content: ""; display: block; width: 0; height: 0; margin: 0 auto 3px; border: 7px solid transparent; border-bottom-color: currentColor; border-top: 0; }
+.gauge .mk.rival.hot { color: var(--coral); }
+.gauge .mk small { font-family: var(--body); font-weight: 700; font-size: 0.42em; margin-left: 0.3em; letter-spacing: 0; }
+.endhold { position: absolute; right: var(--pad-r); bottom: var(--pad-b); pointer-events: auto; font-weight: 700; font-size: 14px; color: var(--fog);
+  padding: 9px 12px; border: 1.5px solid rgba(238, 232, 220, 0.25); border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255, 91, 74, 0.55) var(--hold, 0%), transparent var(--hold, 0%)); }
+.fsbtn { position: absolute; left: var(--pad-l); bottom: var(--pad-b); pointer-events: auto; font-weight: 700; font-size: 14px; color: var(--fog);
+  padding: 9px 12px; border: 1.5px solid rgba(238, 232, 220, 0.25); border-radius: 2px; }
+.countdown { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; font-family: var(--display); font-weight: 900;
+  font-size: min(48vmin, 520px); line-height: 1; color: var(--bone); text-shadow: 0 6px 40px rgba(6, 26, 32, 0.7); }
+.countdown:empty { display: none; }
+.countdown.go { color: var(--signal); }
+.countdown.tick { animation: cd 0.9s ease-out both; }
+@keyframes cd { from { transform: scale(1.18); opacity: 0; } 20% { opacity: 1; } to { transform: scale(0.94); opacity: 0.9; } }
+
+/* ---------- results ---------- */
+#results { overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: max(28px, env(safe-area-inset-top)) max(28px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(28px, env(safe-area-inset-left)); }
+.res { max-width: 1040px; margin: 0 auto; }
+.res h1 { font-family: var(--display); font-weight: 900; font-size: clamp(60px, 10vw, 136px); line-height: 0.84; margin: 0.08em 0 0.18em; }
+.res h1.win { color: var(--signal); }
+.res h1.loss { color: var(--coral); }
+.res .sub { font-size: clamp(16px, 1.8vw, 20px); color: var(--bone); margin: 0 0 26px; }
+#resChart { display: block; width: 100%; height: auto; margin: 0 0 8px; }
+#resChart .zero { stroke: rgba(238, 232, 220, 0.4); stroke-width: 1.5; }
+#resChart .ahead { fill: none; stroke: var(--signal); stroke-width: 3; stroke-linejoin: round; }
+#resChart .behind { fill: none; stroke: var(--coral); stroke-width: 3; stroke-linejoin: round; }
+#resChart .atk { fill: rgba(255, 91, 74, 0.2); }
+#resChart text { fill: var(--fog); font: 600 13px var(--body); }
+.chart-cap { font-size: 13px; color: var(--fog); margin: 0 0 26px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px 28px; margin: 0 0 26px; }
+.stats div { border-top: 1.5px solid rgba(238, 232, 220, 0.2); padding-top: 10px; }
+.stats dt { font-weight: 700; font-size: 14px; color: var(--fog); margin: 0 0 4px; }
+.stats dd { margin: 0; font-family: var(--display); font-weight: 800; font-size: clamp(30px, 3.6vw, 44px); line-height: 1; }
+.res .basemsg { font-size: 16px; line-height: 1.5; margin: 0 0 24px; max-width: 40em; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.actions .primary { width: auto; min-width: 260px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .countdown.tick { animation: none; }
+  .gauge .mk { transition: none; }
+}
+
+</style>
+</head>
+<body>
+
+<section id="setup" class="screen on" aria-label="Race setup">
+  <div class="setup-grid">
+    <div class="setup-main">
+      <h1 class="title">Erg Race</h1>
+      <p class="lede">Race a rival set a little faster than your usual effort. This device's camera reads your rhythm, so <b>ErgData keeps logging on your iPhone</b> and nothing touches the erg.</p>
+
+      <div class="group" role="radiogroup" aria-labelledby="lblMode">
+        <span class="glabel" id="lblMode">Machine</span>
+        <div class="opts" id="optMode"></div>
+      </div>
+      <div class="group" role="radiogroup" aria-labelledby="lblDur">
+        <span class="glabel" id="lblDur">Race length, minutes</span>
+        <div class="opts" id="optDur"></div>
+      </div>
+      <div class="group" role="radiogroup" aria-labelledby="lblLevel">
+        <span class="glabel" id="lblLevel">Rival speed over your baseline</span>
+        <div class="opts" id="optLevel"></div>
+      </div>
+      <div class="toggles">
+        <button type="button" class="toggle" id="tAttacks" aria-pressed="true">Rival attacks and final sprint</button>
+        <button type="button" class="toggle" id="tVoice" aria-pressed="true">Voice calls</button>
+      </div>
+
+      <p class="base"><span id="baseText"></span><button type="button" id="recalBtn" hidden>Recalibrate</button></p>
+      <button type="button" class="primary" id="startBtn">Start race</button>
+
+      <div class="history" id="historyWrap" hidden>
+        <h2>Recent races</h2>
+        <ol id="history"></ol>
+      </div>
+    </div>
+
+    <aside class="setup-cam" aria-label="Camera check">
+      <div class="preview" id="previewSlot">
+        <div class="preview-empty" id="previewEmpty">The camera is off.</div>
+      </div>
+      <p class="cam-status quiet" id="camStatus" aria-live="polite"></p>
+      <canvas id="trace" aria-hidden="true"></canvas>
+      <p class="trace-cap" id="traceCap">Your body position over the last few seconds.</p>
+      <div class="cam-actions">
+        <button type="button" class="ghost" id="camBtn">Turn on camera</button>
+        <button type="button" class="ghost" id="flipBtn" hidden>Switch camera</button>
+        <button type="button" class="ghost" id="demoBtn">Try the demo</button>
+      </div>
+      <p class="tip" id="tip"></p>
+    </aside>
+  </div>
+</section>
+
+<section id="race" class="screen" aria-label="Race">
+  <canvas id="scene"></canvas>
+  <div class="hud">
+    <div class="gapbox" aria-live="off">
+      <div class="gapnum" id="gapNum">0.0</div>
+      <div class="gaptxt" id="gapTxt">m to the rival</div>
+    </div>
+    <div class="metrics">
+      <div class="metric"><div class="num" id="rateNum">–</div><div class="lbl" id="rateLbl">spm</div></div>
+      <div class="metric"><div class="num" id="clockNum">20:00</div><div class="lbl">left</div></div>
+    </div>
+    <div class="status" id="status" role="status"></div>
+    <div class="gauge" id="gauge" aria-hidden="true">
+      <div class="track"></div>
+      <div class="mk you" id="gYou">100%</div>
+      <div class="mk rival" id="gRival">100%</div>
+    </div>
+    <button type="button" class="endhold" id="endBtn">Hold to end race</button>
+    <button type="button" class="fsbtn" id="fsBtn" hidden>Full screen</button>
+  </div>
+  <div class="countdown" id="countdown"></div>
+</section>
+
+<section id="results" class="screen" aria-label="Race result">
+  <div class="res">
+    <h1 id="resTitle">Race over</h1>
+    <p class="sub" id="resSub"></p>
+    <svg id="resChart" role="img" aria-label="Gap to the rival over the race"></svg>
+    <p class="chart-cap">Gap to the rival over the race. Shaded bands are rival attacks.</p>
+    <dl class="stats" id="resStats"></dl>
+    <p class="basemsg" id="resBase"></p>
+    <div class="actions">
+      <button type="button" class="primary" id="againBtn">Race again</button>
+      <button type="button" class="ghost" id="setupBtn">Change setup</button>
+      <button type="button" class="ghost" id="rebaseBtn" hidden>Use this race as my baseline</button>
+    </div>
+  </div>
+</section>
+
+<div id="camDock" class="parked" aria-hidden="true">
+  <video id="cam" playsinline muted autoplay></video>
+  <canvas id="demoView" hidden></canvas>
+  <canvas id="heat"></canvas>
+  <span id="dockDot"></span>
+</div>
+
+<script>
+/* Erg Race — camera motion engine.
+ *
+ * Model-free periodic-motion tracker. No ML, no network.
+ *   - Cycle period (stroke rate / cadence) from frame self-similarity: the
+ *     image repeats once per stroke or pedal revolution, so the lag that
+ *     minimises the mean squared frame difference is the period.
+ *   - Rowing phase from the first principal component of recent frames, a
+ *     1-D "position" signal: catch at one extreme, finish at the other.
+ *     The drive is the faster of the two phases.
+ *   - Effort proxies are pure timing (placement- and lighting-independent):
+ *       RowErg:  drive rise time (10-90 %). Flywheel physics: handle speed
+ *                tracks flywheel speed, P ~ v^3, so split ~ drive time.
+ *       BikeErg: cadence. Fixed gearing + air flywheel: P ~ rpm^3.
+ */
+(function (root) {
+  'use strict';
+
+  const MODE_CFG = {
+    row:  { minP: 60 / 46, maxP: 60 / 14, sTau: 3.5, bgTau: 12, lockOn: 1.6, bufSec: 9.0 },
+    bike: { minP: 60 / 135, maxP: 60 / 35, sTau: 1.3, bgTau: 6, lockOn: 1.0, bufSec: 4.5 },
+  };
+  const TARGET = 64;      // long side of analysis frame (px)
+  const MAX_FPS = 32;     // buffer sizing (frames per second we plan for)
+  const MIN_GAP = 0.024;  // frames closer than this are skipped (decimates 60 fps cameras)
+  const PCA_EVERY = 3;    // run PCA / phase analysis every N frames
+
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+
+  class MotionEngine {
+    constructor(mode) { this.setMode(mode || 'row'); }
+
+    setMode(mode) {
+      if (!MODE_CFG[mode]) throw new Error('unknown mode ' + mode);
+      this.mode = mode;
+      this.cfg = MODE_CFG[mode];
+      this.reset();
+    }
+
+    reset() {
+      this.cap = Math.ceil(this.cfg.bufSec * MAX_FPS);
+      this.w = 0; this.h = 0; this.P = 0;
+      this.frames = new Array(this.cap);
+      this.times = new Float64Array(this.cap);
+      this.G = new Float64Array(this.cap * this.cap);
+      this.Smax = Math.ceil(this.cfg.maxP * MAX_FPS) + 4;
+      this.S = new Float64Array(this.Smax + 2);
+      this.Sn = new Uint32Array(this.Smax + 2);
+      this.n = 0;
+      this.bg = null; this.bgN = 0;
+      this.dt = 1 / 30;       // mean buffer step incl. drops: converts lags to seconds
+      this.dtF = 1 / 30;      // typical frame interval: drives the clock smoother
+      this.tPrevRaw = -1; this.tClock = -1;
+      this.rngS = 1;          // smoothed short-lag dissimilarity range (stillness detector)
+      this._mins = [];
+      // outputs
+      this.locked = false; this.conf = 0; this.meanS = 0;
+      this.rate = 0; this.rateInst = 0; this.period = 0; this.jumpT = 0;
+      this.goodT = 0; this.badT = 0;
+      this.act = 0; this.actRef = 0; this.stillT = 0; this.quiet = false;
+      this.frameCount = 0;
+      this.events = [];
+      // PCA / rowing phase
+      this.pcaU = null; this.pcaG0 = 0; this.pcaN = 0; this.scores = null;
+      this.polEv = 0; this.polarity = 0;
+      this.lastCatchT = -Infinity; this.lastDriveCatchT = -Infinity; this.lastT95 = null; this.lastTd = null;
+      this.strokes = 0; this.lastDrive = null; this.ratio = 0;
+      this.trace = []; // recent {t, q} for display
+      this.latestX = null;
+    }
+
+    _geometry(w, h) {
+      this.w = w; this.h = h; this.P = w * h;
+      this.buf1 = new Float32Array(this.P);
+      this.buf2 = new Float32Array(this.P);
+      this.cur = new Float32Array(this.P);
+      for (let i = 0; i < this.cap; i++) this.frames[i] = new Float32Array(this.P);
+      this.bg = null; this.bgN = 0;
+      this._resetHistory(true);
+    }
+
+    _resetHistory(full) {
+      this.n = 0;
+      this.G.fill(0);
+      if (full) { this.S.fill(0); this.Sn.fill(0); }
+      else { for (let L = 0; L < this.Sn.length; L++) this.Sn[L] = Math.min(this.Sn[L], 8); }
+      this.scores = null; this.pcaU = null; this.pcaN = 0;
+      this.trace.length = 0;
+    }
+
+    /* Feed one luminance frame (any typed array, 0..255), timestamp t in seconds.
+     * Returns true if the frame was used. */
+    pushLuma(src, sw, sh, t) {
+      // ---- timing -------------------------------------------------------
+      if (this.tPrevRaw >= 0) {
+        const d = t - this.tPrevRaw;
+        if (d < MIN_GAP) return false;                      // duplicate / too fast
+        if (d > 0.35) { this._resetHistory(false); this.tClock = -1; }
+        else if (d < 1.5 * this.dtF) this.dtF += 0.05 * (clamp(d, 1 / 60, 0.2) - this.dtF);
+      }
+      this.tPrevRaw = t;
+      const pred = this.tClock + this.dtF;
+      if (this.tClock < 0 || Math.abs(t - pred) > 0.6 * this.dtF) this.tClock = t;
+      else this.tClock = pred + 0.15 * (t - pred);
+      const tc = this.tClock;
+
+      // ---- geometry + downsample ---------------------------------------
+      const f = Math.max(1, Math.round(Math.max(sw, sh) / TARGET));
+      const w = Math.floor(sw / f), h = Math.floor(sh / f);
+      if (w !== this.w || h !== this.h) this._geometry(w, h);
+      const P = this.P, b1 = this.buf1, b2 = this.buf2, cur = this.cur;
+      const inv = 1 / (f * f);
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          let s = 0;
+          for (let dy = 0; dy < f; dy++) {
+            const o = (y * f + dy) * sw + x * f;
+            for (let dx = 0; dx < f; dx++) s += src[o + dx];
+          }
+          b1[y * w + x] = s * inv;
+        }
+      }
+      // 3x3 box blur (separable, clamped edges)
+      for (let y = 0; y < h; y++) {
+        const r = y * w;
+        for (let x = 0; x < w; x++) {
+          const xl = x > 0 ? x - 1 : 0, xr = x < w - 1 ? x + 1 : w - 1;
+          b2[r + x] = (b1[r + xl] + b1[r + x] + b1[r + xr]) / 3;
+        }
+      }
+      let mean = 0;
+      for (let y = 0; y < h; y++) {
+        const yu = y > 0 ? y - 1 : 0, yd = y < h - 1 ? y + 1 : h - 1;
+        for (let x = 0; x < w; x++) {
+          const v = (b2[yu * w + x] + b2[y * w + x] + b2[yd * w + x]) / 3;
+          b1[y * w + x] = v; mean += v;
+        }
+      }
+      mean /= P;
+      let varr = 0;
+      for (let i = 0; i < P; i++) { const d = b1[i] - mean; varr += d * d; }
+      const sd = Math.sqrt(varr / P) + 1.0;   // +1 grey level keeps flat scenes sane
+      for (let i = 0; i < P; i++) cur[i] = (b1[i] - mean) / sd;
+
+      // ---- background subtraction --------------------------------------
+      const C = this.cap;
+      const k = this.n % C;
+      const xk = this.frames[k];
+      if (!this.bg) { this.bg = new Float32Array(cur); this.bgN = 1; }
+      const beta = Math.max(this.dt / this.cfg.bgTau, 1 / (this.bgN + 1));
+      this.bgN++;
+      const bg = this.bg;
+      for (let i = 0; i < P; i++) { const v = cur[i] - bg[i]; xk[i] = v; bg[i] += beta * v; }
+      this.latestX = xk;
+
+      // ---- Gram row for the new frame -----------------------------------
+      const m0 = Math.max(0, this.n - C + 1);
+      for (let m = m0; m <= this.n; m++) {
+        const j = m % C, xj = this.frames[j];
+        let s = 0;
+        for (let i = 0; i < P; i++) s += xk[i] * xj[i];
+        this.G[k * C + j] = s; this.G[j * C + k] = s;
+      }
+      this.times[k] = tc;
+      this.n++;
+      this.frameCount++;
+      const g = this.n - 1;
+      const nk = this.G[k * C + k];
+      if (g >= 10) {                                       // mean step over the buffer
+        const o = Math.max(0, g - C + 1);
+        this.dt = (tc - this.times[o % C]) / (g - o);
+      }
+
+      // ---- activity / stillness -----------------------------------------
+      // Over short lags (<= 0.5 s) a moving body produces both near-identical
+      // and very different frames; a still scene (or pure noise) does not.
+      if (g >= 1) {
+        const j = (g - 1) % C;
+        const d2 = Math.max(0, nk + this.G[j * C + j] - 2 * this.G[k * C + j]) / P;
+        this.act += Math.min(1, this.dt / 0.3) * (d2 - this.act);
+      }
+      const Lq = Math.min(g, Math.round(0.5 / this.dt));
+      if (Lq >= 4) {
+        let rmin = 2, rmax = -2;
+        for (let L = 2; L <= Lq; L++) {
+          const j = (g - L) % C;
+          const den = nk + this.G[j * C + j];
+          const r = den > P * 1e-4 ? 1 - 2 * this.G[k * C + j] / den : 0;
+          if (r < rmin) rmin = r;
+          if (r > rmax) rmax = r;
+        }
+        this.rngS += Math.min(1, this.dt / 0.3) * ((rmax - rmin) - this.rngS);
+      }
+      const quietNow = Lq >= 4 && this.rngS < 0.2;
+      this.stillT = quietNow ? this.stillT + this.dt : 0;
+      const wasQuiet = this.quiet;
+      this.quiet = this.stillT > 0.8;
+      if (wasQuiet && !this.quiet) {     // motion resumed: fresh lags, keep period prior
+        this._resetHistory(false);
+        return true;
+      }
+
+      // ---- self-similarity by lag ----------------------------------------
+      if (!this.quiet && nk > P * 1e-4) {
+        const Lmax = Math.min(g, this.Smax);
+        const aBase = this.dt / this.cfg.sTau;
+        for (let L = 1; L <= Lmax; L++) {
+          const j = (g - L) % C;
+          const nj = this.G[j * C + j];
+          if (nj <= P * 1e-4) continue;
+          const r = 1 - 2 * this.G[k * C + j] / (nk + nj);
+          const cnt = ++this.Sn[L];
+          this.S[L] += Math.max(aBase, 1 / cnt) * (r - this.S[L]);
+        }
+      }
+
+      // ---- period + lock -------------------------------------------------
+      const det = this._detectPeriod();
+      this.conf = det ? det.conf : 0;
+      this.meanS = det ? det.mean : 0;
+      if (det && det.period && det.conf >= 0.2 && !this.quiet) {
+        const ri = 60 / det.period;
+        this.rateInst = ri;
+        if (!this.rate) this.rate = ri;
+        else {
+          const rel = Math.abs(ri - this.rate) / this.rate;
+          if (rel > 0.12) { this.jumpT += this.dt; if (this.jumpT > 1.0) { this.rate = ri; this.jumpT = 0; } }
+          else { this.jumpT = 0; this.rate += Math.min(1, this.dt / 1.2) * (ri - this.rate); }
+        }
+        this.period = 60 / this.rate;
+      }
+      const good = det && det.period && det.conf >= 0.3 && det.mean >= 0.18 && !this.quiet;
+      if (good) { this.goodT += this.dt; this.badT = 0; }
+      else { this.badT += this.dt; this.goodT = Math.max(0, this.goodT - this.dt); }
+      if (!this.locked && this.goodT >= this.cfg.lockOn) {
+        this.locked = true;
+        if (!this.actRef) this.actRef = this.act;
+        this.events.push({ type: 'lock', t: tc });
+      }
+      if (this.locked && (this.quiet || this.badT >= 2.5)) {
+        this.locked = false;
+        this.events.push({ type: 'unlock', t: tc });
+      }
+
+      // ---- phase (PCA) ---------------------------------------------------
+      if (this.frameCount % PCA_EVERY === 0 && this.n >= 15 && !this.quiet) {
+        this._pca();
+        if (this.mode === 'row' && this.scores) this._rowEvents(tc);
+      }
+      return true;
+    }
+
+    _detectPeriod() {
+      const dt = this.dt, S = this.S, Sn = this.Sn;
+      const Lmin = Math.max(2, Math.floor(this.cfg.minP / dt));
+      const Lhi = Math.min(this.Smax - 1, Math.ceil(this.cfg.maxP / dt) + 1, this.n - 2);
+      if (Lhi < Lmin + 3) return null;
+      let sum = 0, cnt = 0;
+      for (let L = Lmin; L <= Lhi; L++) if (Sn[L] > 0) { sum += S[L]; cnt++; }
+      if (cnt < 4) return null;
+      const mean = sum / cnt;
+      const mins = this._mins; mins.length = 0;
+      let best = -1;
+      for (let L = Lmin + 1; L < Lhi; L++) {
+        if (!Sn[L - 1] || !Sn[L] || !Sn[L + 1]) continue;
+        const s = S[L];
+        if (s < S[L - 1] && s <= S[L + 1]) { mins.push(L); if (best < 0 || s < S[best]) best = L; }
+      }
+      if (best < 0) return { conf: 0, mean };
+      const depth = mean - S[best];
+      let pick = best;
+      for (let i = 0; i < mins.length; i++) {          // prefer the fundamental
+        const L = mins[i];
+        if (L >= best) break;
+        if (S[L] <= S[best] + 0.15 * depth) { pick = L; break; }
+      }
+      const a = S[pick - 1], b = S[pick], c = S[pick + 1];
+      const den = a - 2 * b + c;
+      const off = den > 1e-12 ? clamp(0.5 * (a - c) / den, -0.5, 0.5) : 0;
+      return { period: (pick + off) * dt, conf: Math.max(0, (mean - b) / Math.max(mean, 1e-6)), mean };
+    }
+
+    _pca() {
+      const C = this.cap, g = this.n - 1;
+      const per = this.period || this.cfg.maxP;
+      let N = Math.round(Math.max(2.4 * per, 3.0) / this.dt);
+      N = Math.min(N, this.n, C);
+      if (N < 12) return;
+      const g0 = g - N + 1;
+      if (!this._ix || this._ix.length < C) {
+        this._ix = new Int32Array(C); this._rm = new Float64Array(C);
+        this._A = new Float64Array(C * C); this._u = new Float64Array(C); this._v = new Float64Array(C);
+      }
+      const ix = this._ix, rm = this._rm, A = this._A, u = this._u, v = this._v, G = this.G;
+      for (let a = 0; a < N; a++) ix[a] = ((g0 + a) % C) * C;
+      const ixc = new Int32Array(N);
+      for (let a = 0; a < N; a++) ixc[a] = (g0 + a) % C;
+      let gm = 0;
+      for (let a = 0; a < N; a++) {
+        let s = 0; const ra = ix[a];
+        for (let b = 0; b < N; b++) s += G[ra + ixc[b]];
+        rm[a] = s / N; gm += rm[a];
+      }
+      gm /= N;
+      for (let a = 0; a < N; a++) {
+        const ra = ix[a], o = a * N, ma = rm[a] - gm;
+        for (let b = 0; b < N; b++) A[o + b] = G[ra + ixc[b]] - ma - rm[b];
+      }
+      // warm start from previous scores (matched by global frame index)
+      let have = false;
+      if (this.scores) {
+        for (let a = 0; a < N; a++) {
+          const pi = g0 + a - this.pcaG0;
+          u[a] = (pi >= 0 && pi < this.pcaN) ? this.scores[pi] : 0;
+          if (u[a] !== 0) have = true;
+        }
+      }
+      if (!have) for (let a = 0; a < N; a++) u[a] = Math.sin(a * 0.37) + 0.3 * Math.cos(a * 0.11);
+      let lam = 0;
+      for (let it = 0; it < 24; it++) {
+        let nrm = 0;
+        for (let a = 0; a < N; a++) {
+          let s = 0; const o = a * N;
+          for (let b = 0; b < N; b++) s += A[o + b] * u[b];
+          v[a] = s; nrm += s * s;
+        }
+        nrm = Math.sqrt(nrm);
+        if (nrm < 1e-12) return;
+        for (let a = 0; a < N; a++) u[a] = v[a] / nrm;
+        lam = nrm;
+      }
+      const sc = new Float64Array(N);
+      const sl = Math.sqrt(lam);
+      for (let a = 0; a < N; a++) sc[a] = sl * u[a];
+      // keep orientation continuous across updates
+      if (this.scores) {
+        let dot = 0;
+        for (let a = 0; a < N; a++) {
+          const pi = g0 + a - this.pcaG0;
+          if (pi >= 0 && pi < this.pcaN) dot += sc[a] * this.scores[pi];
+        }
+        if (dot < 0) for (let a = 0; a < N; a++) sc[a] = -sc[a];
+      }
+      this.scores = sc; this.pcaG0 = g0; this.pcaN = N;
+      // display trace (latest few seconds, polarity-corrected for rowing)
+      const pol = this.mode === 'row' ? (this.polarity || 1) : 1;
+      this.trace.length = 0;
+      for (let a = 0; a < N; a++) this.trace.push(pol * sc[a]);
+    }
+
+    _rowEvents(now) {
+      const N = this.pcaN, sc = this.scores, C = this.cap, g0 = this.pcaG0;
+      if (N < 20) return;
+      const T = new Float64Array(N), qs = new Float64Array(N);
+      for (let a = 0; a < N; a++) T[a] = this.times[(g0 + a) % C];
+      for (let a = 0; a < N; a++) {             // centred 5-point smoothing
+        let s = 0, c = 0;
+        for (let d = -2; d <= 2; d++) { const b = a + d; if (b >= 0 && b < N) { s += sc[b]; c++; } }
+        qs[a] = s / c;
+      }
+      const sorted = Array.from(qs).sort((x, y) => x - y);
+      const p5 = sorted[Math.floor(0.05 * (N - 1))], p95 = sorted[Math.floor(0.95 * (N - 1))];
+      const amp = p95 - p5;
+      if (!(amp > 1e-6)) return;
+      const delta = 0.22 * amp;
+      // extrema with hysteresis
+      const ext = [];
+      let dir = 0, hiV = qs[0], hiI = 0, loV = qs[0], loI = 0;
+      for (let a = 1; a < N; a++) {
+        const q = qs[a];
+        if (q > hiV) { hiV = q; hiI = a; }
+        if (q < loV) { loV = q; loI = a; }
+        if (dir >= 0 && q < hiV - delta && (dir === 1 || hiI > loI)) {
+          ext.push({ i: hiI, max: true }); dir = -1; loV = q; loI = a;
+        } else if (dir <= 0 && q > loV + delta && (dir === -1 || loI > hiI)) {
+          ext.push({ i: loI, max: false }); dir = 1; hiV = q; hiI = a;
+        }
+      }
+      if (ext.length < 3) return;
+      // drive polarity: the drive is the shorter phase
+      const up = [], dn = [];
+      for (let e = 0; e + 1 < ext.length; e++) {
+        const d = T[ext[e + 1].i] - T[ext[e].i];
+        (ext[e].max ? dn : up).push(d);
+      }
+      if (up.length >= 1 && dn.length >= 1) {
+        const med = (arr) => { const s = arr.slice().sort((x, y) => x - y); return s[s.length >> 1]; };
+        const mu = med(up), md = med(dn);
+        const ev = (md - mu) / (md + mu);
+        this.polEv = 0.85 * this.polEv + 0.15 * ev;
+        if (this.polEv > 0.04) this.polarity = 1;
+        else if (this.polEv < -0.04) this.polarity = -1;
+      }
+      const pol = this.polarity;
+      if (!pol) return;
+      const per = this.period || 2.5;
+      const dt = this.dt;
+      const qv = (a) => pol * qs[a];
+      for (let e = 0; e < ext.length; e++) {
+        const isCatch = pol > 0 ? !ext[e].max : ext[e].max;
+        if (!isCatch) continue;
+        const i = ext[e].i;
+        let off = 0;
+        if (i > 0 && i < N - 1) {
+          const a0 = qv(i - 1), b0 = qv(i), c0 = qv(i + 1), den = a0 - 2 * b0 + c0;
+          if (den > 1e-12) off = clamp(0.5 * (a0 - c0) / den, -0.5, 0.5);
+        }
+        const tc = T[i] + off * dt;
+        if (tc > this.lastCatchT + 0.45 * per && tc > now - 1.6 * per) {
+          if (isFinite(this.lastCatchT)) {
+            const iv = tc - this.lastCatchT;
+            if (this.lastT95 && this.lastTd && iv > 0.45 * per && iv < 1.8 * per) {
+              const rec = tc - this.lastT95;
+              if (rec > 0) this.ratio = rec / this.lastTd;
+            }
+          }
+          this.lastCatchT = tc;
+          this.strokes++;
+          this.events.push({ type: 'catch', t: tc });
+        }
+        // drive metrics for the most recent committed catch, once its finish is confirmed
+        const sameStroke = Math.abs(tc - this.lastCatchT) < 0.3 * per;
+        if (e + 1 < ext.length && sameStroke && this.lastDriveCatchT !== this.lastCatchT) {
+          const fi = ext[e + 1].i;
+          const qc = qv(i), qf = qv(fi), exc = qf - qc;
+          if (exc < 0.6 * delta || fi <= i) continue;
+          const cross = (frac) => {
+            const thr = qc + frac * exc;
+            for (let a = i; a < fi; a++) {
+              const y0 = qv(a), y1 = qv(a + 1);
+              if (y0 < thr && y1 >= thr) return T[a] + (thr - y0) / (y1 - y0) * (T[a + 1] - T[a]);
+            }
+            return null;
+          };
+          const t10 = cross(0.1), t90 = cross(0.9), t95 = cross(0.95);
+          if (t10 == null || t90 == null || t95 == null) continue;
+          const tr = t90 - t10, td = t95 - tc;
+          if (tr < 0.12 || tr > 2.0 || td <= 0) continue;
+          this.lastDriveCatchT = this.lastCatchT;
+          this.lastT95 = t95; this.lastTd = td;
+          this.lastDrive = { tCatch: this.lastCatchT, tr, td, exc };
+          this.events.push({ type: 'drive', tCatch: this.lastCatchT, tr, td, exc });
+        }
+      }
+    }
+
+    /* Coarse, z-normalised background (16x12 grid): identifies the camera
+     * placement so a stored rowing baseline can be checked against it. */
+    fingerprint() {
+      if (!this.bg || !this.w) return null;
+      const fw = 16, fh = 12, out = new Array(fw * fh).fill(0), cnt = new Array(fw * fh).fill(0);
+      for (let y = 0; y < this.h; y++) {
+        const fy = Math.min(fh - 1, Math.floor(y * fh / this.h));
+        for (let x = 0; x < this.w; x++) {
+          const fx = Math.min(fw - 1, Math.floor(x * fw / this.w));
+          out[fy * fw + fx] += this.bg[y * this.w + x]; cnt[fy * fw + fx]++;
+        }
+      }
+      let m = 0;
+      for (let i = 0; i < out.length; i++) { out[i] /= Math.max(1, cnt[i]); m += out[i]; }
+      m /= out.length;
+      let v = 0;
+      for (let i = 0; i < out.length; i++) { out[i] -= m; v += out[i] * out[i]; }
+      const sd = Math.sqrt(v / out.length) || 1;
+      return { w: fw, h: fh, landscape: this.w >= this.h, v: out.map((x) => Math.round((x / sd) * 100) / 100) };
+    }
+
+    static fingerprintMatch(a, b) {
+      if (!a || !b || a.v.length !== b.v.length || a.landscape !== b.landscape) return 0;
+      let s = 0;
+      for (let i = 0; i < a.v.length; i++) s += a.v[i] * b.v[i];
+      return s / a.v.length;   // Pearson r (both z-normalised)
+    }
+
+    /* Remove and return queued events: lock, unlock, catch, drive. */
+    drain() { const e = this.events; this.events = []; return e; }
+
+    snapshot() {
+      return {
+        mode: this.mode, locked: this.locked, quiet: this.quiet, conf: this.conf,
+        rate: this.rate, rateInst: this.rateInst, period: this.period,
+        strokes: this.strokes, ratio: this.ratio, lastDrive: this.lastDrive, polarity: this.polarity,
+        act: this.act, w: this.w, h: this.h, fps: 1 / this.dt,
+      };
+    }
+  }
+
+  root.MotionEngine = MotionEngine;
+  if (typeof module !== 'undefined' && module.exports) module.exports = { MotionEngine };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+/* Erg Race — synthetic athlete renderer.
+ * Renders a crude grey-scale camera view of a rower or cyclist so the engine
+ * can be exercised without a camera (tests, fake-camera video, demo mode). */
+(function (root) {
+  'use strict';
+
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  class SynthAthlete {
+    constructor(o) {
+      o = o || {};
+      this.mode = o.mode || 'row';
+      this.view = o.view || 'front';
+      this.w = o.w || 128; this.h = o.h || 96;
+      this.noise = o.noise != null ? o.noise : 3;
+      this.legsVisible = o.legsVisible != null ? o.legsVisible : true;
+      this.rate = o.rate || (this.mode === 'row' ? 24 : 85);
+      this.drive = o.drive || 0.8;
+      this.jitter = o.jitter != null ? o.jitter : 0.02;
+      this.moving = true;
+      this.rng = mulberry32(o.seed || 7);
+      this.img = new Float32Array(this.w * this.h);
+      this.bg = this._background();
+      this.phase = 0; this.stretch = 1; this.cycle = 0;
+      this.x = 0; this.e = 1;       // row position (0 catch .. 1 finish), arm extension
+      this._spare = null;
+    }
+
+    _gauss() {
+      if (this._spare != null) { const s = this._spare; this._spare = null; return s; }
+      let u = 0, v = 0;
+      while (u === 0) u = this.rng();
+      v = this.rng();
+      const m = Math.sqrt(-2 * Math.log(u));
+      this._spare = m * Math.sin(2 * Math.PI * v);
+      return m * Math.cos(2 * Math.PI * v);
+    }
+
+    _background() {
+      const w = this.w, h = this.h, bg = new Float32Array(w * h);
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) bg[y * w + x] = 70 + 50 * (y / h);
+      for (let k = 0; k < 14; k++) {                  // soft blobs: furniture, shelves
+        const cx = this.rng() * w, cy = this.rng() * h, rx = 4 + this.rng() * w * 0.18, ry = 4 + this.rng() * h * 0.2;
+        const val = 30 + this.rng() * 170;
+        this._ellipse(bg, cx, cy, rx, ry, val, 0.85);
+      }
+      for (let k = 0; k < 4; k++) {                    // a couple of hard vertical edges
+        const x0 = Math.floor(this.rng() * w), val = 40 + this.rng() * 150;
+        for (let y = 0; y < h; y++) for (let x = x0; x < Math.min(w, x0 + 2); x++) bg[y * w + x] = val;
+      }
+      return bg;
+    }
+
+    _ellipse(img, cx, cy, rx, ry, val, alpha, stripe) {
+      const w = this.w, h = this.h;
+      if (rx < 0.4 || ry < 0.4) return;
+      const x0 = Math.max(0, Math.floor(cx - rx - 1)), x1 = Math.min(w - 1, Math.ceil(cx + rx + 1));
+      const y0 = Math.max(0, Math.floor(cy - ry - 1)), y1 = Math.min(h - 1, Math.ceil(cy + ry + 1));
+      const soft = Math.min(rx, ry);
+      for (let y = y0; y <= y1; y++) {
+        for (let x = x0; x <= x1; x++) {
+          const dx = (x + 0.5 - cx) / rx, dy = (y + 0.5 - cy) / ry;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          let cov = (1 - d) * soft + 0.5;
+          if (cov <= 0) continue;
+          if (cov > 1) cov = 1;
+          let v = val;
+          if (stripe) v += stripe * Math.sin((y + 0.5 - cy) / ry * 9);
+          const o = y * w + x, a = cov * (alpha == null ? 1 : alpha);
+          img[o] = img[o] * (1 - a) + v * a;
+        }
+      }
+    }
+
+    /* Advance the kinematics by dt seconds. */
+    step(dt) {
+      if (!this.moving) return;
+      const T = 60 / this.rate * this.stretch;
+      const before = Math.floor(this.phase);
+      this.phase += dt / T;
+      if (Math.floor(this.phase) !== before) {           // new cycle: small rhythm jitter
+        this.cycle++;
+        this.stretch = 1 + (this.rng() * 2 - 1) * this.jitter;
+      }
+      if (this.mode === 'row') {
+        const Tc = 60 / this.rate * this.stretch;
+        const Td = Math.min(this.drive, 0.6 * Tc);
+        const tau = (this.phase % 1) * Tc;
+        if (tau < Td) {
+          const u = tau / Td;
+          this.x = 0.5 - 0.5 * Math.cos(Math.PI * u);
+          this.e = u < 0.65 ? 1 : 1 - (u - 0.65) / 0.35;
+        } else {
+          const Tr = Tc - Td, tp = tau - Td;
+          this.e = Math.min(1, tp / (0.25 * Tr));
+          this.x = tp < 0.15 * Tr ? 1 : 0.5 + 0.5 * Math.cos(Math.PI * (tp - 0.15 * Tr) / (0.85 * Tr));
+        }
+      }
+    }
+
+    /* Render the current pose into this.img (0..255) and return it. */
+    render(t) {
+      const w = this.w, h = this.h, img = this.img;
+      img.set(this.bg);
+      if (this.mode === 'row') this._drawRower(); else this._drawCyclist();
+      const gain = 1 + 0.04 * Math.sin(2 * Math.PI * (t || 0) / 9);   // auto-exposure drift
+      const n = this.noise;
+      for (let i = 0; i < img.length; i++) {
+        let v = img[i] * gain + (n ? n * this._gauss() : 0);
+        img[i] = v < 0 ? 0 : v > 255 ? 255 : v;
+      }
+      return img;
+    }
+
+    _drawRower() {
+      const w = this.w, h = this.h, x = this.x, e = this.e;
+      if (this.view === 'side') {
+        const cx = w * (0.28 + 0.34 * x), lean = (x - 0.45) * w * 0.12;
+        this._ellipse(this.img, cx - lean * 0.2, h * 0.62, w * 0.09, h * 0.24, 55, 1, 14);      // torso
+        this._ellipse(this.img, cx - lean, h * 0.34, w * 0.05, h * 0.075, 190, 1);              // head
+        this._ellipse(this.img, cx - lean, h * 0.29, w * 0.05, h * 0.04, 35, 1);                // hair
+        const hx = cx + w * (0.06 + 0.16 * e);
+        this._ellipse(this.img, (cx + hx) / 2, h * 0.55, Math.abs(hx - cx) / 2 + 1, h * 0.03, 175, 1); // arm
+        this._ellipse(this.img, cx + w * 0.12 * (1 - x), h * 0.82, w * 0.12, h * 0.05, 60, 1);   // legs
+        return;
+      }
+      // front view: distance 0.75 m (catch) .. 1.5 m (finish)
+      const s = 0.75 / (0.75 + 0.75 * x);
+      const cx = w / 2 + w * 0.01 * Math.sin(this.phase * 2 * Math.PI);
+      const hy = h * 0.5 - s * h * 0.17 + (1 - x) * h * 0.06;
+      const ty = hy + s * h * 0.48;
+      this._ellipse(this.img, cx, ty, s * w * 0.21, s * h * 0.38, 55, 1, 16);             // torso
+      // arms + handle (handle closer to camera when arms extended)
+      const sh = 0.75 / Math.max(0.45, 0.75 + 0.75 * x - 0.5 * e);
+      const hdy = ty - s * h * 0.06 + (sh - s) * h * 0.25;
+      this._ellipse(this.img, cx - s * w * 0.13, (ty + hdy) / 2, sh * w * 0.035, Math.abs(hdy - ty) / 2 + s * h * 0.08, 175, 1);
+      this._ellipse(this.img, cx + s * w * 0.13, (ty + hdy) / 2, sh * w * 0.035, Math.abs(hdy - ty) / 2 + s * h * 0.08, 175, 1);
+      this._ellipse(this.img, cx, hdy, sh * w * 0.22, sh * h * 0.025, 20, 1);              // handle
+      this._ellipse(this.img, cx, hy, s * w * 0.085, s * h * 0.14, 195, 1);                // face
+      this._ellipse(this.img, cx, hy - s * h * 0.09, s * w * 0.09, s * h * 0.07, 30, 1);   // hair
+      this._ellipse(this.img, cx - s * w * 0.03, hy - s * h * 0.01, s * w * 0.012, s * h * 0.015, 40, 1);
+      this._ellipse(this.img, cx + s * w * 0.03, hy - s * h * 0.01, s * w * 0.012, s * h * 0.015, 40, 1);
+      // knees rise into view near the catch
+      const kv = 1 - x;
+      if (kv > 0.05) {
+        const ky = h * (1.08 - 0.3 * kv), ks = 0.75 / (0.55 + 0.4 * x);
+        this._ellipse(this.img, cx - ks * w * 0.1, ky, ks * w * 0.07, ks * h * 0.1, 85, 1);
+        this._ellipse(this.img, cx + ks * w * 0.1, ky, ks * w * 0.07, ks * h * 0.1, 85, 1);
+      }
+    }
+
+    _drawCyclist() {
+      const w = this.w, h = this.h, ph = this.phase * 2 * Math.PI;
+      const cx = w / 2 + w * 0.006 * Math.sin(ph);         // lateral rock, 1x cadence
+      const bob = h * 0.004 * Math.sin(2 * ph);              // vertical bob, 2x cadence
+      const hy = h * 0.27 + bob, ty = h * 0.52 + bob;
+      this._ellipse(this.img, cx, ty, w * 0.17, h * 0.22, 60, 1, 12);              // torso
+      this._ellipse(this.img, cx - w * 0.15, h * 0.62, w * 0.03, h * 0.12, 175, 1); // arms to bars
+      this._ellipse(this.img, cx + w * 0.15, h * 0.62, w * 0.03, h * 0.12, 175, 1);
+      this._ellipse(this.img, cx, hy, w * 0.07, h * 0.1, 195, 1);                   // face
+      this._ellipse(this.img, cx, hy - h * 0.06, w * 0.075, h * 0.05, 30, 1);
+      this._ellipse(this.img, w / 2, h * 0.72, w * 0.26, h * 0.015, 25, 1);           // handlebar (static)
+      const ky0 = this.legsVisible ? h * 0.86 : h * 1.25, A = h * 0.07;
+      const kl = ky0 - A * Math.sin(ph), kr = ky0 + A * Math.sin(ph);
+      const kxl = cx - w * 0.11 - w * 0.01 * Math.cos(ph), kxr = cx + w * 0.11 + w * 0.01 * Math.cos(ph);
+      this._ellipse(this.img, kxl, kl, w * 0.06, h * 0.085, 90, 1, 8);
+      this._ellipse(this.img, kxr, kr, w * 0.06, h * 0.085, 90, 1, 8);
+    }
+  }
+
+  root.SynthAthlete = SynthAthlete;
+  if (typeof module !== 'undefined' && module.exports) module.exports = { SynthAthlete };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+/* Erg Race — game logic, rendering and UI. */
+(function () {
+  'use strict';
+  const MotionEngine = window.MotionEngine, SynthAthlete = window.SynthAthlete;
+  const $ = (s) => document.querySelector(s);
+  const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+  const median = (a) => {
+    if (!a.length) return NaN;
+    const s = a.slice().sort((x, y) => x - y), m = s.length >> 1;
+    return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+  };
+  const mean = (a) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : NaN);
+  const fmtClock = (s) => { s = Math.max(0, Math.ceil(s - 1e-6)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+  const fmtGap = (g) => { const a = Math.abs(g); return (a < 10 ? a.toFixed(1) : String(Math.round(a))) + ' m'; };
+  const pct = (d) => { const v = d * 100; return (Math.abs(v - Math.round(v)) < 0.05 ? Math.round(v) : v.toFixed(1)) + '%'; };
+  const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+  const params = new URLSearchParams(location.search);
+  let timeScale = Math.max(1, Number(params.get('timescale')) || 1);
+
+  // ---------- persistence ------------------------------------------------
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem('ergrace.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem('ergrace.' + k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } },
+  };
+  const Base = { get: (m) => store.get('baseline.' + m, null), set: (m, b) => store.set('baseline.' + m, b) };
+
+  // ---------- configuration ----------------------------------------------
+  const LEVELS = [
+    { name: 'Easy', d: 0.01 }, { name: 'Steady', d: 0.02 }, { name: 'Hard', d: 0.035 }, { name: 'Savage', d: 0.05 },
+  ];
+  const DURS = [5, 10, 15, 20, 30, 45, 60];
+  const MODE = {
+    row: { label: 'RowErg', unit: 'spm', vnom: 4.0, mark: 100, noun: 'row', verbing: 'rowing', cycles: 'strokes', calib: 90, minCal: 12,
+      tip: 'Stand the iPad or Mac 1 to 2 m in front of the erg, camera facing you, so your head and shoulders stay in frame from catch to finish. Keep it in the same spot each time: your baseline is tied to it. Keep fans and screens out of view.' },
+    bike: { label: 'BikeErg', unit: 'rpm', vnom: 9.0, mark: 250, noun: 'ride', verbing: 'pedaling', cycles: 'pedal strokes', calib: 60, minCal: 40,
+      tip: 'Put the iPad or Mac in front of the bike, camera facing you and tilted down so your knees show at the bottom of the frame. Cadence works from any angle. Keep fans and screens out of view.' },
+  };
+  const S = Object.assign({ mode: 'row', dur: 20, level: 2, attacks: true, voice: true }, store.get('settings', {}));
+  if (!MODE[S.mode]) S.mode = 'row';
+  if (!DURS.includes(S.dur)) S.dur = 20;
+  if (!LEVELS[S.level]) S.level = 2;
+  const saveSettings = () => store.set('settings', S);
+  let recal = false;
+
+  let engine = new MotionEngine(S.mode);
+
+  const el = {};
+  ['setup', 'race', 'results', 'optMode', 'optDur', 'optLevel', 'tAttacks', 'tVoice', 'baseText', 'recalBtn', 'startBtn',
+    'historyWrap', 'history', 'previewSlot', 'previewEmpty', 'camStatus', 'trace', 'traceCap', 'camBtn', 'flipBtn', 'demoBtn', 'tip',
+    'camDock', 'cam', 'demoView', 'heat', 'scene', 'gapNum', 'gapTxt', 'rateNum', 'rateLbl', 'clockNum', 'status', 'gYou', 'gRival',
+    'endBtn', 'fsBtn', 'countdown', 'resTitle', 'resSub', 'resChart', 'resStats', 'resBase', 'againBtn', 'setupBtn', 'rebaseBtn',
+  ].forEach((id) => { el[id] = document.getElementById(id); });
+
+  // ---------- sound + voice ----------------------------------------------
+  const Sound = {
+    ctx: null,
+    unlock() {
+      try {
+        if (!this.ctx) { const AC = window.AudioContext || window.webkitAudioContext; if (AC) this.ctx = new AC(); }
+        if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+      } catch (e) { /* no audio */ }
+      try { if (window.speechSynthesis) { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } } catch (e) { /* no speech */ }
+    },
+    tone(freq, dur, delay, vol, type) {
+      const c = this.ctx; if (!c) return;
+      try {
+        const t0 = c.currentTime + (delay || 0), o = c.createOscillator(), g = c.createGain();
+        o.type = type || 'triangle'; o.frequency.value = freq;
+        g.gain.setValueAtTime(0.0001, t0);
+        g.gain.exponentialRampToValueAtTime(vol || 0.35, t0 + 0.012);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+        o.connect(g); g.connect(c.destination); o.start(t0); o.stop(t0 + dur + 0.05);
+      } catch (e) { /* ignore */ }
+    },
+    count() { this.tone(660, 0.2); },
+    go() { this.tone(990, 0.55, 0, 0.4); },
+    attack() { this.tone(560, 0.15, 0, 0.4, 'square'); this.tone(560, 0.15, 0.2, 0.4, 'square'); },
+    lead(up) { this.tone(660, 0.13); this.tone(up ? 880 : 440, 0.22, 0.14); },
+    finish(win) { (win ? [523, 659, 784, 1047] : [523, 466, 392]).forEach((f, i) => this.tone(f, 0.32, i * 0.16, 0.32)); },
+    say(text, urgent) {
+      if (!S.voice || !window.speechSynthesis) return;
+      try {
+        if (urgent) speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text); u.rate = 1.05; u.lang = 'en-US';
+        speechSynthesis.speak(u);
+      } catch (e) { /* ignore */ }
+    },
+  };
+
+  const Wake = {
+    lock: null, want: false,
+    async on() {
+      this.want = true;
+      try { if ('wakeLock' in navigator && !this.lock) { this.lock = await navigator.wakeLock.request('screen'); this.lock.addEventListener('release', () => { this.lock = null; }); } } catch (e) { /* not granted */ }
+    },
+    off() { this.want = false; try { if (this.lock) this.lock.release(); } catch (e) { /* ignore */ } this.lock = null; },
+  };
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && Wake.want) Wake.on(); });
+
+  // ---------- frame sources: camera or demo athlete ------------------------
+  const Source = {
+    kind: null, stream: null, devs: [], devIdx: -1, err: '', frames: 0, lastAt: 0,
+    cv: document.createElement('canvas'), ctx: null, luma: null,
+    synth: null, timer: 0, lastT: 0, mt: { use: undefined, last: null, bad: 0 },
+
+    async camera(next) {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { this.err = 'insecure'; throw new Error('insecure'); }
+      const v = { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 30, max: 30 } };
+      if (next && this.devs.length > 1) { this.devIdx = (this.devIdx + 1) % this.devs.length; v.deviceId = { exact: this.devs[this.devIdx] }; }
+      else v.facingMode = 'user';
+      this.stop();
+      try { this.stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: v }); }
+      catch (e) { this.err = (e && e.name) || 'error'; onSourceChange(); throw e; }
+      this.err = '';
+      const vid = el.cam;
+      vid.srcObject = this.stream; vid.muted = true;
+      try { await vid.play(); } catch (e) { /* autoplay attribute covers it */ }
+      this.kind = 'camera'; this.mt = { use: undefined, last: null, bad: 0 };
+      try {
+        const ds = await navigator.mediaDevices.enumerateDevices();
+        this.devs = ds.filter((d) => d.kind === 'videoinput' && d.deviceId).map((d) => d.deviceId);
+        const cur = this.stream.getVideoTracks()[0].getSettings().deviceId;
+        const i = this.devs.indexOf(cur); if (i >= 0) this.devIdx = i;
+      } catch (e) { /* enumeration optional */ }
+      engine.reset();
+      this.pump();
+      onSourceChange();
+    },
+    pump() {
+      const vid = el.cam, self = this;
+      if (vid.requestVideoFrameCallback) {
+        const cb = (now, meta) => { if (self.kind !== 'camera') return; self.grab(self.stamp(now, meta)); vid.requestVideoFrameCallback(cb); };
+        vid.requestVideoFrameCallback(cb);
+      } else {
+        const tick = (now) => { if (self.kind !== 'camera') return; self.grab(now / 1000); requestAnimationFrame(tick); };
+        requestAnimationFrame(tick);
+      }
+    },
+    stamp(now, meta) {
+      const m = this.mt, t = meta && meta.mediaTime;
+      if (m.use !== false && typeof t === 'number' && t > 0) {
+        if (m.last != null) { const d = t - m.last; if (!(d > 0.004 && d < 0.5) && ++m.bad > 8) m.use = false; }
+        m.last = t;
+        if (m.use !== false) { m.use = true; return t; }
+      }
+      m.use = false;
+      return now / 1000;
+    },
+    grab(t) {
+      const vid = el.cam, vw = vid.videoWidth, vh = vid.videoHeight;
+      if (!vw || !vh || vid.readyState < 2) return;
+      const s = 128 / Math.max(vw, vh), w = Math.max(8, Math.round(vw * s)), h = Math.max(8, Math.round(vh * s));
+      if (this.cv.width !== w || this.cv.height !== h || !this.ctx) {
+        this.cv.width = w; this.cv.height = h;
+        this.ctx = this.cv.getContext('2d', { willReadFrequently: true });
+        this.luma = new Float32Array(w * h);
+        el.previewSlot.style.aspectRatio = vw + ' / ' + vh;
+        requestAnimationFrame(placeDock);
+      }
+      this.ctx.drawImage(vid, 0, 0, w, h);
+      let d;
+      try { d = this.ctx.getImageData(0, 0, w, h).data; } catch (e) { return; }
+      const L = this.luma;
+      for (let i = 0, j = 0; j < L.length; i += 4, j++) L[j] = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+      engine.pushLuma(L, w, h, t);
+      this.frames++; this.lastAt = performance.now();
+    },
+    demo() {
+      this.stop();
+      this.kind = 'demo';
+      const syn = this.synth = new SynthAthlete({ mode: S.mode, rate: S.mode === 'row' ? 24 : 86, drive: 0.82, noise: 4, seed: (Math.random() * 1e9) | 0 });
+      Demo.reset();
+      engine.reset();
+      const cv = el.demoView, ctx = cv.getContext('2d');
+      cv.width = syn.w; cv.height = syn.h;
+      const id = ctx.createImageData(syn.w, syn.h);
+      el.previewSlot.style.aspectRatio = syn.w + ' / ' + syn.h;
+      this.lastT = performance.now() / 1000;
+      this.timer = setInterval(() => {
+        const t = performance.now() / 1000, dt = Math.min(0.1, t - this.lastT);
+        this.lastT = t;
+        Demo.think(dt); syn.step(dt);
+        const img = syn.render(t);
+        engine.pushLuma(img, syn.w, syn.h, t);
+        const p = id.data;
+        for (let i = 0, j = 0; j < img.length; i += 4, j++) { const v = img[j]; p[i] = v; p[i + 1] = v; p[i + 2] = v; p[i + 3] = 255; }
+        ctx.putImageData(id, 0, 0);
+        this.frames++; this.lastAt = performance.now();
+      }, 1000 / 30);
+      onSourceChange();
+    },
+    stop() {
+      if (this.stream) { this.stream.getTracks().forEach((tr) => tr.stop()); this.stream = null; }
+      el.cam.srcObject = null;
+      if (this.timer) { clearInterval(this.timer); this.timer = 0; }
+      this.kind = null; this.synth = null;
+      onSourceChange();
+    },
+  };
+
+  // The demo athlete answers most attacks and fights back when dropped.
+  const Demo = {
+    eff: 1, wob: 0, wobT: 0,
+    reset() { this.eff = 1; this.wob = 0; this.wobT = 0; },
+    think(dt) {
+      const s = Source.synth; if (!s) return;
+      if ((this.wobT -= dt) <= 0) { this.wobT = 4 + Math.random() * 6; this.wob = (Math.random() * 2 - 1) * 0.012; }
+      let target = 1 + this.wob;
+      if (R.phase === 'racing' && R.demo) {
+        const ev = eventAt(R.raceT);
+        if (ev && ev.kind === 'attack' && R.raceT > ev.t0 + 2 && ev.demoAnswer) target = 1.08;
+        else if (ev && ev.kind === 'sprint') target = 1.06;
+        else target += LEVELS[R.level].d * 0.85 + (R.gap < -6 ? 0.02 : 0);
+      }
+      this.eff += Math.min(1, dt / 2.5) * (target - this.eff);
+      if (s.mode === 'row') { s.drive = 0.82 / this.eff; s.rate = 24 * (0.65 + 0.35 * this.eff); }
+      else s.rate = 86 * this.eff;
+    },
+  };
+
+  // ---------- race state ---------------------------------------------------
+  const R = { phase: 'idle', mode: S.mode, gap: 0, raceT: 0, demo: false };
+
+  function newRace() {
+    const m = MODE[S.mode], demo = Source.kind === 'demo';
+    const base = demo ? null : Base.get(S.mode);
+    const needCal = demo || !base || recal;
+    for (const k of Object.keys(R)) delete R[k];
+    Object.assign(R, {
+      phase: 'waiting', prev: null, mode: S.mode, demo, level: S.level, dur: S.dur * 60, t: 0,
+      calibLen: needCal ? (demo ? 20 : m.calib) : 0, calSamples: [], calAcc: 0,
+      baseline: needCal ? null : base.v, baseRec: needCal ? null : base,
+      cd: 0, cdSec: 0, started: false, raceT: 0, raceLen: 0,
+      xP: 0, xR: 0, effP: 1, effPSet: false, effR: 1, gap: 0, lead: 0, lastLeadCall: -99, marks: [], lastBeep: 0,
+      excRef: null, excSamples: [], raw: [], rates: [], effs: [], hist: [], histT: -9, sampT: 0, strokes: 0,
+      schedule: [], statusMsg: '', statusKind: '', statusUntil: 0,
+      placementWarn: false, placementChecked: false, lockedFor: 0,
+      phiP: 0, phiR: 0, puddles: [], ended: false, lastDriveAt: performance.now(), calWarnT: 0, driveWarnAt: 0, stalled: false,
+    });
+    Scene.ppm = 0;
+  }
+
+  function buildSchedule(len) {
+    const ev = [];
+    if (!S.attacks) return ev;
+    const fin = len >= 600 ? 60 : len >= 300 ? 45 : 30;
+    let t = Math.min(150 + Math.random() * 60, len * 0.3);
+    while (t + 60 <= len - fin - 20) {
+      ev.push({ kind: 'attack', t0: t, dur: 30, amp: 0.06, demoAnswer: Math.random() < 0.75 });
+      ev.push({ kind: 'fade', t0: t + 30, dur: 30, amp: -0.02 });
+      t += 180 + Math.random() * 90;
+    }
+    ev.push({ kind: 'sprint', t0: len - fin, dur: fin, amp: 0.035 });
+    return ev;
+  }
+  function eventAt(t) {
+    if (!R.schedule) return null;
+    for (const e of R.schedule) if (t >= e.t0 && t < e.t0 + e.dur) return e;
+    return null;
+  }
+
+  function setStatus(msg, kind, secs) { R.statusMsg = msg; R.statusKind = kind || 'info'; R.statusUntil = (R.t || 0) + (secs || 4); }
+
+  function onEngineEvent(e) {
+    if (e.type === 'catch') {
+      if (R.phase === 'racing') R.strokes++;
+      const per = engine.period || 2.5;
+      R.phiP = clamp(0.25 / per, 0, 0.3);
+      el.rateNum.classList.add('pulse');
+      setTimeout(() => el.rateNum.classList.remove('pulse'), 160);
+    } else if (e.type === 'drive') onDrive(e);
+  }
+
+  function onDrive(e) {
+    if (R.phase === 'idle' || R.phase === 'done' || R.mode !== 'row') return;
+    if (R.excRef == null) { R.excSamples.push(e.exc); if (R.excSamples.length >= 8) R.excRef = median(R.excSamples); }
+    const lenF = R.excRef ? Math.sqrt(clamp(e.exc / R.excRef, 0.85, 1.15)) : 1;
+    const raw = lenF / e.tr;   // ~ drive speed (stroke length / drive time)
+    R.lastDriveAt = performance.now();
+    if (R.phase === 'calib') { R.calSamples.push(raw); return; }
+    if (!R.baseline) return;
+    if (R.phase === 'racing' || R.phase === 'countdown') {
+      const eff = clamp(raw / R.baseline, 0.6, 1.5);
+      if (!R.effPSet) { R.effP = eff; R.effPSet = true; } else R.effP += 0.4 * (eff - R.effP);
+      if (R.phase === 'racing') R.raw.push(raw);
+    }
+  }
+
+  function update(dt) {
+    for (const e of engine.drain()) onEngineEvent(e);
+    if (R.phase === 'idle' || R.phase === 'done') return;
+    const fresh = Source.kind && performance.now() - Source.lastAt < 1500;   // camera still delivering?
+    const locked = engine.locked && fresh, dts = dt * timeScale;
+    R.stalled = !fresh;
+    if (locked) R.lockedFor += dt; else R.lockedFor = 0;
+    if (R.mode === 'bike' && R.baseline && locked && engine.rate > 0 && (R.phase === 'countdown' || R.phase === 'racing')) {
+      R.effP = clamp(engine.rate / R.baseline, 0.5, 1.6); R.effPSet = true;   // P ~ rpm^3, speed ~ rpm
+    }
+
+    // Rowing timing depends on camera placement: check it against calibration.
+    if (R.mode === 'row' && !R.placementChecked && R.baseRec && R.baseRec.fp && R.lockedFor > 8) {
+      R.placementChecked = true;
+      const r = MotionEngine.fingerprintMatch(engine.fingerprint(), R.baseRec.fp);
+      if (r < 0.55) { R.placementWarn = true; setStatus('The camera looks moved since calibration, so effort may read off', 'warn', 8); }
+    }
+
+    switch (R.phase) {
+      case 'waiting':
+        if (locked) {
+          if (R.calibLen > 0) {
+            R.phase = 'calib';
+            Sound.say(`Calibrating. Hold your normal steady effort for ${Math.round(R.calibLen)} seconds.`);
+          } else startCountdown();
+        }
+        break;
+      case 'calib':
+        if (!locked) { pause(); break; }
+        R.t += dts;
+        if (R.mode === 'bike' && engine.rate > 0 && (R.calAcc += dts) >= 0.5) { R.calAcc = 0; R.calSamples.push(engine.rate); }
+        if (R.t >= R.calibLen && R.calSamples.length >= (R.demo ? 6 : MODE[R.mode].minCal)) finishCalib();
+        else if (R.t >= R.calibLen + 45) {
+          if (R.calSamples.length >= 4) finishCalib();                      // settle for fewer samples
+          else if (R.t - (R.calWarnT || 0) > 10) { R.calWarnT = R.t; setStatus(`Your ${MODE[R.mode].cycles} aren\u2019t reading clearly. Check that the camera sees you from catch to finish`, 'warn', 8); }
+        }
+        break;
+      case 'countdown':
+        if (!locked) { pause(); break; }
+        R.t += dts; R.cd -= dts;
+        if (R.cd <= 0) go();
+        else if (Math.ceil(R.cd) !== R.cdSec) { R.cdSec = Math.ceil(R.cd); Sound.count(); showCount(String(R.cdSec)); }
+        break;
+      case 'racing':
+        if (!locked) { pause(); break; }
+        stepRace(dts);
+        if (R.mode === 'row' && performance.now() - R.lastDriveAt > 10000 && performance.now() - R.driveWarnAt > 15000) {
+          R.driveWarnAt = performance.now(); setStatus('Strokes aren\u2019t reading clearly. Check the camera view', 'warn', 6);
+        }
+        break;
+      case 'paused':
+        if (locked) resume();
+        break;
+    }
+  }
+
+  function pause() {
+    R.prev = R.phase; R.phase = 'paused';
+    showCount('');
+    Sound.say('Paused.');
+  }
+  function resume() {
+    const p = R.prev || 'waiting';
+    R.phase = p;
+    if (p === 'countdown') startCountdown();
+  }
+  function finishCalib() {
+    const v = median(R.calSamples);
+    R.baseline = v;
+    if (!R.demo) {
+      Base.set(R.mode, { v, date: new Date().toISOString(), n: 0, fp: R.mode === 'row' ? engine.fingerprint() : null });
+      R.baseRec = Base.get(R.mode); R.placementChecked = true;
+    }
+    recal = false;
+    Sound.say('Baseline set.');
+    startCountdown();
+  }
+  function startCountdown() { R.phase = 'countdown'; R.cd = 3; R.cdSec = 0; }
+  function go() {
+    R.phase = 'racing'; R.started = true; R.lastDriveAt = performance.now();
+    R.raceLen = Math.max(30, R.dur - R.t); R.raceT = 0;
+    R.schedule = buildSchedule(R.raceLen);
+    R.effR = 1 + LEVELS[R.level].d;
+    R.xP = 0; R.xR = 0; R.gap = 0;
+    if (!R.effPSet) R.effP = 1;
+    showCount('Go', true);
+    setTimeout(() => { if (el.countdown.textContent === 'Go') showCount(''); }, 900);
+    Sound.go(); Sound.say('Go!', true);
+  }
+  function showCount(txt, isGo) {
+    el.countdown.textContent = txt;
+    el.countdown.classList.toggle('go', !!isGo);
+    el.countdown.classList.remove('tick'); void el.countdown.offsetWidth;
+    if (txt) el.countdown.classList.add('tick');
+  }
+
+  function stepRace(dts) {
+    R.t += dts; R.raceT += dts;
+    if (R.mode === 'bike' && engine.rate > 0 && (R.sampT += dts) >= 0.5) { R.sampT = 0; R.raw.push(engine.rate); }
+    const ev = eventAt(R.raceT);
+    const target = 1 + LEVELS[R.level].d + (ev ? ev.amp : 0);
+    R.effR += Math.min(1, dts / 2.5) * (target - R.effR);
+    const v = MODE[R.mode].vnom;
+    R.xP += v * R.effP * dts; R.xR += v * R.effR * dts;
+    R.gap = R.xP - R.xR;
+    cues();
+    if (R.raceT - R.histT >= 2) {
+      R.histT = R.raceT; R.hist.push([R.raceT, R.gap]);
+      R.effs.push(R.effP); if (engine.rate) R.rates.push(engine.rate);
+    }
+    if (R.t >= R.dur) finish(false);
+  }
+
+  const spokenTime = (s) => { const m = Math.round(s / 60); return m >= 1 ? `${m} ${m === 1 ? 'minute' : 'minutes'}` : `${Math.round(s)} seconds`; };
+  const spokenGap = (g) => { const m = Math.round(Math.abs(g)); return m < 1 ? 'Dead level.' : `${g > 0 ? 'Up' : 'Down'} ${m} ${m === 1 ? 'meter' : 'meters'}.`; };
+
+  function cues() {
+    const t = R.raceT, len = R.raceLen;
+    for (const e of R.schedule) {
+      if (e.kind === 'attack') {
+        if (!e.warned && t >= e.t0 - 5) { e.warned = true; Sound.say('Rival attacks in five.'); }
+        if (!e.started && t >= e.t0) { e.started = true; e.gap0 = R.gap; Sound.attack(); Sound.say('Attack! Go with it.', true); }
+        if (e.started && !e.ended && t >= e.t0 + e.dur) {
+          e.ended = true;
+          const dg = R.gap - e.gap0, m = Math.round(Math.abs(dg));
+          e.answered = dg >= -1;
+          Sound.say(e.answered ? (m >= 1 && dg > 0 ? `Attack answered. You gained ${m} ${m === 1 ? 'meter' : 'meters'}.` : 'Attack answered.') : `You lost ${m} meters on that attack.`);
+          setStatus(e.answered ? (dg >= 1 ? `Attack answered, +${fmtGap(dg)}` : 'Attack answered') : `Lost ${fmtGap(dg)} on the attack`, e.answered ? 'good' : 'bad', 5);
+        }
+      } else if (e.kind === 'sprint' && !e.started && t >= e.t0) {
+        e.started = true; Sound.attack();
+        Sound.say(e.dur >= 60 ? 'Final minute. The rival is sprinting.' : 'Final sprint. Empty the tank.', true);
+      }
+    }
+    const st = R.gap > 1.5 ? 1 : R.gap < -1.5 ? -1 : R.lead;
+    if (st !== R.lead) {
+      const was = R.lead; R.lead = st;
+      if (was !== 0 && t > 15 && t - R.lastLeadCall > 6) { R.lastLeadCall = t; Sound.lead(st > 0); Sound.say(st > 0 ? 'You take the lead.' : 'The rival takes the lead.'); }
+    }
+    if (len >= 480) {
+      for (let k = 1; k <= 3; k++) {
+        if (!R.marks[k] && t >= len * k / 4) { R.marks[k] = true; Sound.say(`${spokenTime(len - t)} left. ${spokenGap(R.gap)}`); }
+      }
+    }
+    const left = R.dur - R.t, sec = Math.ceil(left);
+    if (left <= 3.02 && sec > 0 && sec !== R.lastBeep) { R.lastBeep = sec; Sound.count(); }
+  }
+
+  function statusLine() {
+    const m = MODE[R.mode];
+    if (R.statusMsg && R.t < R.statusUntil) return [R.statusMsg, R.statusKind];
+    switch (R.phase) {
+      case 'waiting': return [`Start ${m.verbing}. Locking on to your rhythm`, 'info'];
+      case 'paused': return [R.stalled ? 'Paused: the camera stopped sending video' : `Paused. Start ${m.verbing} to carry on`, 'info'];
+      case 'calib': {
+        const left = Math.max(0, R.calibLen - R.t);
+        return [left > 0 ? `Calibrating: hold your normal steady effort, ${fmtClock(left)}` : `Calibrating: a few more ${m.cycles}`, 'info'];
+      }
+      case 'racing': {
+        const ev = eventAt(R.raceT);
+        if (ev && ev.kind === 'attack') return [`Rival attacking, ${Math.ceil(ev.t0 + ev.dur - R.raceT)} s`, 'attack'];
+        if (ev && ev.kind === 'sprint') return [`Final sprint, ${fmtClock(R.raceLen - R.raceT)}`, 'attack'];
+        const nx = R.schedule.find((e) => e.kind === 'attack' && R.raceT >= e.t0 - 5 && R.raceT < e.t0);
+        if (nx) return [`Rival attacks in ${Math.ceil(nx.t0 - R.raceT)}`, 'warn'];
+        if (ev && ev.kind === 'fade') return ['Rival is fading. Make it count', 'info'];
+        return ['', ''];
+      }
+      default: return ['', ''];
+    }
+  }
+
+  function finish(ended) {
+    if (R.phase === 'done') return;
+    R.ended = ended; R.phase = 'done';
+    Wake.off(); showCount('');
+    if (R.started) R.hist.push([R.raceT, R.gap]);
+    const win = !R.started ? 0 : R.gap > 0.5 ? 1 : R.gap < -0.5 ? -1 : 0;
+    const attacks = R.schedule.filter((e) => e.kind === 'attack' && e.ended);
+    const answered = attacks.filter((e) => e.answered).length;
+    const avgRate = mean(R.rates), avgEff = mean(R.effs);
+    let baseMsg = '', canRebase = false;
+    if (R.demo) baseMsg = 'Demo race. Nothing was saved.';
+    else if (!R.started) baseMsg = 'The race never started, so nothing changed.';
+    else {
+      const minRaw = R.mode === 'row' ? 60 : 300;
+      if (R.placementWarn) {
+        baseMsg = 'Baseline not updated: the camera position differs from calibration. If this is your new spot, save this race as the baseline.';
+        canRebase = R.raw.length >= 20;
+      } else if (R.raceT >= 270 && R.raw.length >= minRaw && R.baseline) {
+        const old = R.baseline, nv = 0.7 * old + 0.3 * median(R.raw);
+        const rec = Object.assign({}, R.baseRec || {}, { v: nv, date: new Date().toISOString(), n: ((R.baseRec && R.baseRec.n) || 0) + 1 });
+        if (R.mode === 'row') rec.fp = engine.fingerprint() || rec.fp;
+        Base.set(R.mode, rec);
+        const p = (nv / old - 1) * 100;
+        baseMsg = Math.abs(p) < 0.1 ? 'Baseline unchanged.'
+          : p > 0 ? `Baseline up ${p.toFixed(1)}%. Your next rival starts faster.` : `Baseline down ${(-p).toFixed(1)}%. Your next rival eases off a little.`;
+      } else if (R.raceT < 270) baseMsg = 'Baseline unchanged: races under 5 minutes don’t count toward it.';
+      else baseMsg = `Baseline unchanged: too few clean ${MODE[R.mode].cycles} were measured. Check the camera view before the next race.`;
+      const h = store.get('history', []);
+      h.unshift({ d: new Date().toISOString(), m: R.mode, dur: Math.round(R.dur / 60), lvl: R.level, res: win, gap: Math.round(R.gap * 10) / 10,
+        rate: isFinite(avgRate) ? Math.round(avgRate * 10) / 10 : null, eff: isFinite(avgEff) ? Math.round(avgEff * 1000) / 1000 : null, att: [answered, attacks.length], end: ended });
+      store.set('history', h.slice(0, 50));
+    }
+    Sound.finish(win >= 0);
+    if (R.started) Sound.say(win > 0 ? `You win by ${spokenGap(R.gap).replace(/^Up |\.$/g, '')}.` : win < 0 ? `The rival wins by ${spokenGap(R.gap).replace(/^Down |\.$/g, '')}.` : 'Dead heat.', true);
+    renderResults({ win, attacks: attacks.length, answered, avgRate, avgEff, baseMsg, canRebase });
+    show('results');
+  }
+
+  // ---------- race scene (canvas) -------------------------------------------
+  function oarAngle(phi) {
+    const df = 0.36, cA = 0.95, fA = -0.62;
+    if (phi < df) { const u = phi / df; return cA + (fA - cA) * (0.5 - 0.5 * Math.cos(Math.PI * u)); }
+    const u = (phi - df) / (1 - df);
+    return fA + (cA - fA) * (0.5 - 0.5 * Math.cos(Math.PI * u));
+  }
+  const Scene = {
+    ctx: null, W: 0, H: 0, dpr: 1, ppm: 0, t: 0,
+    resize() {
+      const cv = el.scene, W = cv.clientWidth, H = cv.clientHeight;
+      if (!W || !H) return;
+      this.dpr = Math.min(2, window.devicePixelRatio || 1); this.W = W; this.H = H;
+      cv.width = Math.round(W * this.dpr); cv.height = Math.round(H * this.dpr);
+      this.ctx = cv.getContext('2d');
+    },
+    layout() {
+      const W = this.W, H = this.H, port = H > W * 1.05, vmin = Math.min(W, H);
+      const gaugeY = H - (16 + 50 + 0.05 * vmin);          // matches .gauge bottom offset in CSS
+      const y0 = H * (port ? 0.44 : 0.46);
+      const y1 = Math.max(y0 + 60, Math.min(H * (port ? 0.77 : 0.79), gaugeY - 0.05 * vmin - 26)), laneH = (y1 - y0) / 2;
+      return { port, y0, y1, laneH, yR: y0 + laneH * 0.5, yP: y0 + laneH * 1.5 };
+    },
+    draw(dt) {
+      const cv = el.scene;
+      if (!this.ctx || cv.width !== Math.round(cv.clientWidth * this.dpr) || cv.height !== Math.round(cv.clientHeight * this.dpr)) this.resize();
+      const ctx = this.ctx, W = this.W, H = this.H;
+      if (!ctx || !W) return;
+      this.t += dt;
+      ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+      const Lo = this.layout(), row = R.mode === 'row';
+      const len = row ? 8.2 : 1.8, spanMin = row ? 34 : 18, spanMax = row ? 260 : 320;
+      const want = clamp((W * 0.55) / (Math.abs(R.xP - R.xR) + len * 1.6), W / spanMax, W / spanMin);
+      this.ppm = this.ppm ? this.ppm + (want - this.ppm) * Math.min(1, dt * 1.5) : want;
+      const ppm = this.ppm, half = W / 2 / ppm;
+      let camX = (R.xP + R.xR) / 2;
+      if (Math.abs(R.xP - camX) > half * 0.62) camX = R.xP - Math.sign(R.xP - camX) * half * 0.62;
+      const sx = (x) => W / 2 + (x - camX) * ppm;
+      const moving = R.phase === 'racing' || R.phase === 'countdown' || R.phase === 'calib';
+      // stroke / pedal phases
+      if (moving && engine.locked && engine.rate) R.phiP = (R.phiP + dt * engine.rate / 60) % 1;
+      const rivalRate = (engine.rate || (row ? 24 : 86)) * (R.phase === 'racing' ? R.effR / (1 + LEVELS[R.level].d) : 1);
+      if (moving) R.phiR = (R.phiR + dt * rivalRate / 60) % 1;
+      const ev = R.phase === 'racing' ? eventAt(R.raceT) : null;
+      const hot = ev && (ev.kind === 'attack' || ev.kind === 'sprint');
+      const rivalCol = hot ? '#FF5B4A' : '#EEE8DC';
+
+      if (row) this.water(ctx, Lo, camX, half, sx, ppm); else this.road(ctx, Lo, camX, half, sx, ppm);
+      this.markers(ctx, Lo, camX, half, sx, ppm, row);
+      if (row) {
+        this.puddles(ctx, Lo, sx, ppm);
+        this.boat(ctx, sx(R.xR), Lo.yR, Lo.laneH, ppm, rivalCol, R.phiR, 'r', R.xR);
+        this.boat(ctx, sx(R.xP), Lo.yP, Lo.laneH, ppm, '#FFD23F', R.phiP, 'p', R.xP);
+      } else {
+        this.rider(ctx, sx(R.xR), Lo.yR, Lo.laneH, ppm, rivalCol, R.phiR);
+        this.rider(ctx, sx(R.xP), Lo.yP, Lo.laneH, ppm, '#FFD23F', R.phiP);
+      }
+      this.edge(ctx, Lo, sx(R.xR), R.xR - R.xP, rivalCol);
+    },
+    water(ctx, Lo, camX, half, sx, ppm) {
+      const W = this.W, H = this.H;
+      ctx.fillStyle = '#0B2730'; ctx.fillRect(0, 0, W, H);
+      const sp = 5, a = Math.floor((camX - half - 6) / sp), b = Math.ceil((camX + half + 6) / sp);
+      ctx.strokeStyle = 'rgba(238,232,220,0.07)'; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
+      ctx.beginPath();
+      for (let k = a; k <= b; k++) {
+        for (let r = 0; r < 3; r++) {
+          const y = H * (0.04 + 0.92 * hash(k * 3 + r)), x = sx(k * sp + hash(k * 7 + r) * sp), l = Math.min(90, (1.2 + 3 * hash(k * 11 + r)) * ppm);
+          ctx.moveTo(x, y); ctx.lineTo(x + l, y);
+        }
+      }
+      ctx.stroke();
+      // lane ropes: buoys every 2.5 m, larger every 50 m
+      const ys = [Lo.y0, Lo.y0 + Lo.laneH, Lo.y1];
+      let step = 2.5; while (step * ppm < 7) step *= 2;
+      const r0 = Math.max(1.4, Lo.laneH * 0.016);
+      for (const y of ys) {
+        ctx.fillStyle = 'rgba(238,232,220,0.42)';
+        ctx.beginPath();
+        for (let x = Math.floor((camX - half) / step) * step; x <= camX + half + step; x += step) {
+          if (Math.abs(x % 50) < 1e-6) continue;
+          ctx.moveTo(sx(x) + r0, y); ctx.arc(sx(x), y, r0, 0, Math.PI * 2);
+        }
+        ctx.fill();
+        ctx.fillStyle = '#FF5B4A';
+        ctx.beginPath();
+        for (let x = Math.floor((camX - half) / 50) * 50; x <= camX + half + 50; x += 50) { ctx.moveTo(sx(x) + r0 * 2, y); ctx.arc(sx(x), y, r0 * 2, 0, Math.PI * 2); }
+        ctx.fill();
+      }
+    },
+    road(ctx, Lo, camX, half, sx, ppm) {
+      const W = this.W, H = this.H;
+      ctx.fillStyle = '#10261F'; ctx.fillRect(0, 0, W, H);
+      const r0 = Lo.y0 - Lo.laneH * 0.22, r1 = Lo.y1 + Lo.laneH * 0.22;
+      ctx.fillStyle = '#24292C'; ctx.fillRect(0, r0, W, r1 - r0);
+      // verge texture and posts every 50 m
+      const sp = 4, a = Math.floor((camX - half - 4) / sp), b = Math.ceil((camX + half + 4) / sp);
+      ctx.strokeStyle = 'rgba(238,232,220,0.05)'; ctx.lineWidth = 1.5; ctx.beginPath();
+      for (let k = a; k <= b; k++) {
+        for (let r = 0; r < 3; r++) {
+          const top = hash(k * 5 + r) < 0.5, y = top ? r0 * (0.06 + 0.9 * hash(k * 13 + r)) : r1 + (H - r1) * (0.06 + 0.9 * hash(k * 13 + r));
+          const x = sx(k * sp + hash(k * 7 + r) * sp), l = Math.min(60, (0.6 + 1.6 * hash(k * 17 + r)) * ppm);
+          ctx.moveTo(x, y); ctx.lineTo(x + l, y);
+        }
+      }
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(238,232,220,0.55)';
+      ctx.fillRect(0, r0 + 3, W, 2); ctx.fillRect(0, r1 - 5, W, 2);
+      let dash = 3, per = 9; while (per * ppm < 24) { dash *= 2; per *= 2; }
+      ctx.fillStyle = 'rgba(238,232,220,0.6)';
+      const ym = Lo.y0 + Lo.laneH - 1.5;
+      for (let x = Math.floor((camX - half) / per) * per; x <= camX + half + per; x += per) ctx.fillRect(sx(x), ym, dash * ppm, 3);
+      let pst = 50; while (pst * ppm < 40) pst *= 2;
+      ctx.fillStyle = 'rgba(238,232,220,0.5)';
+      for (let x = Math.floor((camX - half) / pst) * pst; x <= camX + half + pst; x += pst) {
+        ctx.fillRect(sx(x) - 1.5, r0 - Lo.laneH * 0.14, 3, Lo.laneH * 0.09);
+        ctx.fillRect(sx(x) - 1.5, r1 + Lo.laneH * 0.05, 3, Lo.laneH * 0.09);
+      }
+    },
+    markers(ctx, Lo, camX, half, sx, ppm, row) {
+      let mk = MODE[R.mode].mark;
+      while (mk * ppm < 110) mk *= 2;
+      const top = row ? Lo.y0 : Lo.y0 - Lo.laneH * 0.22, bot = row ? Lo.y1 : Lo.y1 + Lo.laneH * 0.22;
+      const fs = Math.round(clamp(Lo.laneH * 0.2, 14, 30));
+      ctx.font = `700 ${fs}px "Big Shoulders Display", "Arial Narrow", sans-serif`;
+      ctx.textBaseline = 'bottom';
+      for (let x = Math.max(mk, Math.floor((camX - half) / mk) * mk); x <= camX + half + mk; x += mk) {
+        const X = sx(x);
+        ctx.fillStyle = 'rgba(238,232,220,0.16)'; ctx.fillRect(X - 1, top, 2, bot - top);
+        ctx.fillStyle = 'rgba(138,166,172,0.95)';
+        ctx.fillText(x >= 1000 ? (x / 1000).toFixed(x % 1000 ? 2 : 0).replace(/0$/, '') + ' km' : x + ' m', X + 6, top - 6);
+      }
+    },
+    puddles(ctx, Lo, sx, ppm) {
+      const now = this.t, keep = [];
+      for (const p of R.puddles) {
+        const age = now - p.t; if (age > 5) continue;
+        keep.push(p);
+        const a = 0.28 * (1 - age / 5), rr = Lo.laneH * (0.035 + 0.02 * age / 5);
+        ctx.strokeStyle = `rgba(238,232,220,${a.toFixed(3)})`; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.ellipse(sx(p.x), p.y, rr * 1.4, rr, 0, 0, Math.PI * 2); ctx.stroke();
+      }
+      R.puddles = keep;
+    },
+    boat(ctx, x, y, s, ppm, color, phi, who, worldX) {
+      const Lp = clamp(8.2 * ppm, s * 1.15, Math.min(s * 4.4, this.W * 0.3)), hw = s * 0.055;
+      const ang = oarAngle(phi), inDrive = phi < 0.36, oar = s * 0.43, px = x - Lp * 0.03;
+      // puddle where the blades leave the water
+      const key = who === 'p' ? 'finP' : 'finR';
+      if (inDrive) R[key] = true;
+      else if (R[key]) {
+        R[key] = false;
+        for (const side of [-1, 1]) R.puddles.push({ x: worldX + (Math.sin(ang) * oar - Lp * 0.03) / ppm, y: y + side * (hw * 1.5 + Math.cos(ang) * oar), t: this.t });
+      }
+      ctx.lineCap = 'round';
+      for (const side of [-1, 1]) {
+        const py = y + side * hw * 1.5, dx = Math.sin(ang) * oar, dy = side * Math.cos(ang) * oar;
+        ctx.strokeStyle = 'rgba(238,232,220,0.85)'; ctx.lineWidth = Math.max(1.5, s * 0.014);
+        ctx.beginPath(); ctx.moveTo(px - dx * 0.22, py - dy * 0.22); ctx.lineTo(px + dx, py + dy); ctx.stroke();
+        ctx.fillStyle = color;
+        ctx.beginPath(); ctx.ellipse(px + dx, py + dy, s * 0.055, s * 0.022, Math.atan2(dy, dx), 0, Math.PI * 2); ctx.fill();
+        if (inDrive) {
+          ctx.strokeStyle = 'rgba(238,232,220,0.32)'; ctx.lineWidth = 1.5;
+          ctx.beginPath(); ctx.arc(px + dx * 1.04, py + dy * 1.04, s * 0.06, 0, Math.PI * 2); ctx.stroke();
+        }
+      }
+      ctx.strokeStyle = 'rgba(238,232,220,0.16)'; ctx.lineWidth = 1.5;   // wake
+      ctx.beginPath(); ctx.moveTo(x - Lp * 0.42, y - hw); ctx.lineTo(x - Lp / 2 - s * 1.1, y - s * 0.2);
+      ctx.moveTo(x - Lp * 0.42, y + hw); ctx.lineTo(x - Lp / 2 - s * 1.1, y + s * 0.2); ctx.stroke();
+      ctx.fillStyle = color;
+      ctx.beginPath(); ctx.moveTo(x + Lp / 2, y);
+      ctx.quadraticCurveTo(x, y - hw * 2, x - Lp / 2, y);
+      ctx.quadraticCurveTo(x, y + hw * 2, x + Lp / 2, y); ctx.fill();
+      ctx.fillStyle = '#082028';
+      ctx.beginPath(); ctx.ellipse(px - Lp * 0.02, y, hw * 1.25, hw * 1.7, 0, 0, Math.PI * 2); ctx.fill();
+    },
+    rider(ctx, x, y, s, ppm, color, phi) {
+      const L = clamp(1.8 * ppm, s * 0.9, s * 2.2), a = Math.sin(phi * 2 * Math.PI), dark = '#0A1418';
+      ctx.strokeStyle = 'rgba(238,232,220,0.16)'; ctx.lineWidth = 1.5;   // speed lines
+      ctx.beginPath();
+      for (const k of [-0.09, 0, 0.09]) { ctx.moveTo(x - L * 0.62, y + s * k); ctx.lineTo(x - L * (1.25 + Math.abs(k) * 3), y + s * k * 1.4); }
+      ctx.stroke();
+      ctx.fillStyle = dark;
+      ctx.beginPath(); ctx.ellipse(x + L * 0.38, y, L * 0.2, s * 0.035, 0, 0, Math.PI * 2); ctx.fill();   // front wheel
+      ctx.beginPath(); ctx.ellipse(x - L * 0.38, y, L * 0.2, s * 0.035, 0, 0, Math.PI * 2); ctx.fill();   // rear wheel
+      ctx.strokeStyle = dark; ctx.lineWidth = Math.max(2, s * 0.03);
+      ctx.beginPath(); ctx.moveTo(x - L * 0.38, y); ctx.lineTo(x + L * 0.38, y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x + L * 0.3, y - s * 0.14); ctx.lineTo(x + L * 0.3, y + s * 0.14); ctx.stroke();  // bars
+      ctx.fillStyle = color;                                    // legs: knees drive fore and aft
+      ctx.beginPath(); ctx.ellipse(x - L * 0.02 + a * L * 0.12, y - s * 0.075, L * 0.15, s * 0.04, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(x - L * 0.02 - a * L * 0.12, y + s * 0.075, L * 0.15, s * 0.04, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(x - L * 0.06, y, L * 0.2, s * 0.11, 0, 0, Math.PI * 2); ctx.fill();      // torso
+      ctx.strokeStyle = color; ctx.lineWidth = Math.max(2, s * 0.03);
+      ctx.beginPath(); ctx.moveTo(x + L * 0.05, y - s * 0.08); ctx.lineTo(x + L * 0.3, y - s * 0.12);
+      ctx.moveTo(x + L * 0.05, y + s * 0.08); ctx.lineTo(x + L * 0.3, y + s * 0.12); ctx.stroke();        // arms
+      ctx.fillStyle = dark; ctx.beginPath(); ctx.ellipse(x + L * 0.11, y, s * 0.07, s * 0.06, 0, 0, Math.PI * 2); ctx.fill();  // helmet
+    },
+    edge(ctx, Lo, rx, ahead, color) {
+      const W = this.W;
+      if (rx >= -10 && rx <= W + 10) return;
+      const right = rx > W, y = Lo.yR, fs = Math.round(clamp(Lo.laneH * 0.26, 16, 34));
+      ctx.font = `800 ${fs}px "Big Shoulders Display", "Arial Narrow", sans-serif`;
+      ctx.textBaseline = 'middle';
+      const label = `Rival ${fmtGap(ahead)} ${ahead > 0 ? 'ahead' : 'behind'}`;
+      const tw = ctx.measureText(label).width, ax = right ? W - 18 : 18;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      if (right) { ctx.moveTo(ax, y); ctx.lineTo(ax - 16, y - 12); ctx.lineTo(ax - 16, y + 12); }
+      else { ctx.moveTo(ax, y); ctx.lineTo(ax + 16, y - 12); ctx.lineTo(ax + 16, y + 12); }
+      ctx.fill();
+      ctx.fillText(label, right ? ax - 26 - tw : ax + 26, y);
+    },
+  };
+
+  // ---------- HUD ----------------------------------------------------------------
+  let lastHud = { gap: '', txt: '' };
+  function hudTick() {
+    const m = MODE[R.mode], started = R.started;
+    const g = started ? R.gap : 0, a = Math.abs(g);
+    const num = (g < -0.05 ? '−' : '+') + (a < 10 ? a.toFixed(1) : String(Math.round(a)));
+    const txt = !started ? 'm to the rival' : a < 0.05 ? 'm, dead level' : g > 0 ? 'm ahead of the rival' : 'm behind the rival';
+    if (num !== lastHud.gap) { el.gapNum.textContent = started ? num : '0.0'; lastHud.gap = num; }
+    if (txt !== lastHud.txt) { el.gapTxt.textContent = txt; lastHud.txt = txt; }
+    el.gapNum.classList.toggle('behind', started && g < -0.05);
+    el.gapNum.classList.toggle('level', !started || a < 0.05);
+    el.rateLbl.textContent = m.unit;
+    el.rateNum.textContent = engine.locked && !R.stalled && engine.rate ? String(Math.round(engine.rate)) : '\u2013';
+    el.clockNum.textContent = fmtClock(R.dur - R.t);
+    const [msg, kind] = statusLine();
+    if (el.status.textContent !== msg) el.status.textContent = msg;
+    el.status.className = 'status ' + (kind || '');
+    // effort gauge: 85% .. 120% of baseline
+    const pos = (e) => (clamp((e - 0.85) / 0.35, 0, 1) * 100).toFixed(2) + '%';
+    const youE = R.baseline && R.effPSet ? R.effP : null;
+    const rivE = R.phase === 'racing' ? R.effR : 1 + LEVELS[R.level].d;
+    el.gYou.style.left = pos(youE || 1);
+    el.gYou.style.visibility = youE ? 'visible' : 'hidden';
+    el.gRival.style.left = pos(rivE);
+    const bikeTxt = (e) => (R.baseline ? Math.round(R.baseline * e) + '<small>rpm</small>' : '');
+    const youH = youE ? (R.mode === 'bike' ? bikeTxt(youE) : Math.round(youE * 100) + '<small>%</small>') : '';
+    const rivH = (R.mode === 'bike' && R.baseline ? bikeTxt(rivE) : pct(rivE).replace('%', '') + '<small>%</small>') + '<small>rival</small>';
+    if (youH !== lastHud.you) { el.gYou.innerHTML = youH; lastHud.you = youH; }
+    if (rivH !== lastHud.riv) { el.gRival.innerHTML = rivH; lastHud.riv = rivH; }
+    const ev = R.phase === 'racing' ? eventAt(R.raceT) : null;
+    el.gRival.classList.toggle('hot', !!(ev && (ev.kind === 'attack' || ev.kind === 'sprint')));
+    el.camDock.classList.toggle('locked', engine.locked);
+  }
+
+  // ---------- setup screen ---------------------------------------------------
+  function opts(container, items, cur, onPick) {
+    container.innerHTML = '';
+    for (const it of items) {
+      const b = document.createElement('button');
+      b.type = 'button'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(it[0] === cur));
+      b.innerHTML = `<span>${it[1]}</span>` + (it[2] ? `<small>${it[2]}</small>` : '');
+      b.addEventListener('click', () => { onPick(it[0]); saveSettings(); renderSetup(); });
+      container.appendChild(b);
+    }
+  }
+  function renderSetup() {
+    opts(el.optMode, [['row', 'RowErg'], ['bike', 'BikeErg']], S.mode, (v) => { if (v !== S.mode) { S.mode = v; setMode(v); } });
+    opts(el.optDur, DURS.map((d) => [d, String(d)]), S.dur, (v) => { S.dur = v; });
+    opts(el.optLevel, LEVELS.map((l, i) => [i, l.name, '+' + pct(l.d)]), S.level, (v) => { S.level = v; });
+    el.tAttacks.setAttribute('aria-pressed', String(S.attacks));
+    el.tVoice.setAttribute('aria-pressed', String(S.voice));
+    el.tip.textContent = MODE[S.mode].tip;
+    el.traceCap.textContent = S.mode === 'row' ? 'Your body position over the last few seconds. Each dip is a catch.' : 'Your leg motion over the last few seconds.';
+    const m = MODE[S.mode], b = Base.get(S.mode), d = LEVELS[S.level].d;
+    let txt;
+    if (recal) txt = `Your next race opens with ${m.calib} s of calibration at your normal steady effort.`;
+    else if (!b) txt = `No ${m.label} baseline yet. Your first race opens with ${m.calib} s of calibration at your normal steady effort.`;
+    else {
+      const when = new Date(b.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      txt = S.mode === 'bike'
+        ? `Your baseline is ${Math.round(b.v)} rpm (updated ${when}), so the rival rides at ${Math.round(b.v * (1 + d))} rpm.`
+        : `Baseline updated ${when}. The rival rows ${pct(d)} faster than it.`;
+    }
+    el.baseText.textContent = txt + ' ';
+    el.recalBtn.hidden = !b;
+    el.recalBtn.textContent = recal ? 'Keep my baseline' : 'Recalibrate';
+    renderHistory();
+  }
+  function renderHistory() {
+    const h = store.get('history', []);
+    el.historyWrap.hidden = !h.length;
+    el.history.innerHTML = '';
+    for (const r of h.slice(0, 5)) {
+      const li = document.createElement('li');
+      const when = new Date(r.d).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      const res = r.res > 0 ? `won by ${fmtGap(r.gap)}` : r.res < 0 ? `lost by ${fmtGap(r.gap)}` : 'dead heat';
+      li.textContent = `${when}: ${r.dur} min ${MODE[r.m] ? MODE[r.m].noun : ''}, ${LEVELS[r.lvl] ? LEVELS[r.lvl].name.toLowerCase() : ''} rival, ${res}`;
+      el.history.appendChild(li);
+    }
+  }
+  function setMode(v) {
+    engine.setMode(v);
+    if (Source.kind === 'demo') Source.demo();
+  }
+  function camErrorText(e) {
+    if (e === 'insecure') return 'The camera needs a secure page. Open the GitHub Pages link rather than a saved file.';
+    if (e === 'NotAllowedError' || e === 'SecurityError') return 'Camera access is blocked. Allow the camera for this site in your browser settings, then reload the page.';
+    if (e === 'NotFoundError' || e === 'OverconstrainedError') return 'No camera found on this device. Connect one, or try the demo.';
+    if (e === 'NotReadableError') return 'Another app is using the camera. Close it, then turn the camera on again.';
+    return 'The camera didn’t start. Reload the page and try again.';
+  }
+  function onSourceChange() {
+    const k = Source.kind;
+    el.camBtn.textContent = k === 'camera' ? 'Turn off camera' : 'Turn on camera';
+    el.demoBtn.textContent = k === 'demo' ? 'Stop the demo' : 'Try the demo';
+    el.flipBtn.hidden = !(k === 'camera' && Source.devs.length > 1);
+    el.previewEmpty.textContent = Source.err ? camErrorText(Source.err) : 'The camera is off.';
+    el.previewEmpty.hidden = !!k;
+    el.cam.hidden = k !== 'camera';
+    el.demoView.hidden = k !== 'demo';
+    el.camDock.classList.toggle('mirror', k === 'camera');
+    el.startBtn.textContent = k === 'demo' ? 'Start demo race' : 'Start race';
+    placeDock();
+  }
+  function setupTick() {
+    const m = MODE[S.mode];
+    let txt, quiet = true;
+    if (!Source.kind) txt = Source.err ? camErrorText(Source.err) : 'Turn on the camera to check what the game can see. The video stays on this device.';
+    else if (!engine.locked) txt = Source.kind === 'demo' ? 'The demo athlete is warming up.' : `Looking for your rhythm. ${m.verbing[0].toUpperCase() + m.verbing.slice(1)} a few ${m.cycles} helps it lock on.`;
+    else { txt = `${Source.kind === 'demo' ? 'Demo athlete' : 'Seeing you'}: ${Math.round(engine.rate)} ${m.unit}`; quiet = false; }
+    if (el.camStatus.textContent !== txt) el.camStatus.textContent = txt;
+    el.camStatus.classList.toggle('quiet', quiet);
+    drawTrace(); drawHeat();
+  }
+  function drawTrace() {
+    const cv = el.trace, dpr = Math.min(2, window.devicePixelRatio || 1), w = cv.clientWidth, h = cv.clientHeight;
+    if (!w) return;
+    if (cv.width !== Math.round(w * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+    const ctx = cv.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = 'rgba(238,232,220,0.12)'; ctx.fillRect(0, h - 1, w, 1);
+    const tr = engine.trace;
+    if (!Source.kind || tr.length < 4) return;
+    let lo = Infinity, hi = -Infinity;
+    for (const v of tr) { if (v < lo) lo = v; if (v > hi) hi = v; }
+    const span = Math.max(hi - lo, 1e-6);
+    ctx.strokeStyle = engine.locked ? '#FFD23F' : 'rgba(138,166,172,0.8)'; ctx.lineWidth = 2; ctx.lineJoin = 'round';
+    ctx.beginPath();
+    tr.forEach((v, i) => { const x = (i / (tr.length - 1)) * w, y = h - 4 - ((v - lo) / span) * (h - 8); if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y); });
+    ctx.stroke();
+  }
+  let heatCtx = null, heatImg = null;
+  function drawHeat() {
+    const X = engine.latestX, cv = el.heat;
+    if (!X || !Source.kind || current !== 'setup') { if (heatCtx) heatCtx.clearRect(0, 0, cv.width, cv.height); return; }
+    if (cv.width !== engine.w || cv.height !== engine.h || !heatCtx) {
+      cv.width = engine.w; cv.height = engine.h; heatCtx = cv.getContext('2d'); heatImg = heatCtx.createImageData(engine.w, engine.h);
+    }
+    const p = heatImg.data;
+    for (let j = 0, i = 0; j < X.length; j++, i += 4) {
+      const v = Math.min(1, Math.abs(X[j]) / 1.6);
+      p[i] = 255; p[i + 1] = 210; p[i + 2] = 63; p[i + 3] = Math.round(v * v * 200);
+    }
+    heatCtx.putImageData(heatImg, 0, 0);
+  }
+
+  // one camera element, positioned over the current screen's slot
+  let current = 'setup';
+  function placeDock() {
+    const d = el.camDock;
+    d.classList.remove('thumb', 'parked');
+    if (!Source.kind || current === 'results') { d.classList.add('parked'); return; }
+    if (current === 'setup') {
+      const r = el.previewSlot.getBoundingClientRect();
+      Object.assign(d.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' });
+      el.heat.hidden = false;
+    } else {
+      const W = innerWidth, H = innerHeight, vm = Math.min(W, H);
+      const parts = (el.previewSlot.style.aspectRatio || '').split('/').map(parseFloat);
+      const ar = parts.length === 2 && parts[0] > 0 && parts[1] > 0 ? parts[0] / parts[1] : 4 / 3;
+      const w = Math.round(vm * (H > W ? 0.24 : 0.2)), h = Math.round(w / ar);
+      Object.assign(d.style, { left: (W - w - 22) + 'px', top: Math.round(vm * 0.2 + 24) + 'px', width: w + 'px', height: h + 'px' });
+      d.classList.add('thumb');
+      el.heat.hidden = true;
+    }
+  }
+
+  function show(name) {
+    current = name;
+    for (const s of ['setup', 'race', 'results']) el[s].classList.toggle('on', s === name);
+    if (name === 'race') { Scene.resize(); lastHud = { gap: '', txt: '' }; }
+    if (name === 'setup') renderSetup();
+    placeDock();
+  }
+
+  // ---------- results ----------------------------------------------------------
+  function renderResults(r) {
+    const lv = LEVELS[R.level], m = MODE[R.mode];
+    el.resTitle.className = r.win > 0 ? 'win' : r.win < 0 ? 'loss' : '';
+    el.resTitle.textContent = !R.started ? 'No race' : r.win > 0 ? `You won by ${fmtGap(R.gap)}` : r.win < 0 ? `The rival won by ${fmtGap(R.gap)}` : 'Dead heat';
+    const mins = Math.max(1, Math.round(R.raceT / 60));
+    const art = /^[aeiou]/i.test(lv.name) ? 'an' : 'a';
+    el.resSub.textContent = R.started
+      ? `${mins}-minute ${m.noun} against ${art} ${lv.name.toLowerCase()} rival${R.ended ? ', ended early' : ''}.`
+      : 'The race ended before the start.';
+    const rows = [];
+    if (isFinite(r.avgRate)) rows.push([R.mode === 'row' ? 'Average rate' : 'Average cadence', `${r.avgRate.toFixed(1)} ${m.unit}`]);
+    if (isFinite(r.avgEff)) rows.push(['Effort vs baseline', `${Math.round(r.avgEff * 100)}%`]);
+    if (R.mode === 'row' && R.strokes) rows.push(['Strokes', String(R.strokes)]);
+    if (r.attacks) rows.push(['Attacks answered', `${r.answered} of ${r.attacks}`]);
+    el.resStats.innerHTML = rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+    el.resBase.textContent = r.baseMsg;
+    el.rebaseBtn.hidden = !r.canRebase;
+    el.rebaseBtn.disabled = false;
+    el.rebaseBtn.textContent = 'Use this race as my baseline';
+    drawChart();
+  }
+  function drawChart() {
+    const svg = el.resChart, W = 900, H = 260, pl = 52, pr = 14, pt = 14, pb = 30;
+    const pts = R.hist && R.hist.length ? R.hist : [[0, 0]];
+    const tMax = Math.max(10, R.raceT || 10);
+    const gMax = Math.max(4, ...pts.map((p) => Math.abs(p[1]))) * 1.12;
+    const X = (t) => pl + (t / tMax) * (W - pl - pr), Y = (g) => pt + (1 - (g + gMax) / (2 * gMax)) * (H - pt - pb);
+    const d = [[0, 0]].concat(pts).map((p, i) => (i ? 'L' : 'M') + X(p[0]).toFixed(1) + ' ' + Y(p[1]).toFixed(1)).join(' ');
+    const atk = (R.schedule || []).filter((e) => e.kind === 'attack' && e.t0 < tMax)
+      .map((e) => `<rect class="atk" x="${X(e.t0).toFixed(1)}" y="${pt}" width="${(X(Math.min(tMax, e.t0 + e.dur)) - X(e.t0)).toFixed(1)}" height="${H - pt - pb}"/>`).join('');
+    const z = Y(0).toFixed(1), gm = Math.round(gMax);
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.innerHTML = `<defs><clipPath id="cAb"><rect x="0" y="0" width="${W}" height="${z}"/></clipPath><clipPath id="cBe"><rect x="0" y="${z}" width="${W}" height="${H}"/></clipPath></defs>
+      ${atk}<line class="zero" x1="${pl}" x2="${W - pr}" y1="${z}" y2="${z}"/>
+      <path class="ahead" d="${d}" clip-path="url(#cAb)"/><path class="behind" d="${d}" clip-path="url(#cBe)"/>
+      <text x="${pl - 8}" y="${pt + 10}" text-anchor="end">+${gm} m</text>
+      <text x="${pl - 8}" y="${(+z + 4).toFixed(1)}" text-anchor="end">0</text>
+      <text x="${pl - 8}" y="${H - pb}" text-anchor="end">−${gm} m</text>
+      <text x="${pl}" y="${H - 8}">0:00</text>
+      <text x="${W - pr}" y="${H - 8}" text-anchor="end">${fmtClock(tMax)}</text>`;
+  }
+
+  // ---------- wiring -------------------------------------------------------------
+  async function ensureSource() {
+    if (Source.kind) return true;
+    try { await Source.camera(); return true; } catch (e) { return false; }
+  }
+  el.camBtn.addEventListener('click', async () => {
+    if (Source.kind === 'camera') { Source.stop(); return; }
+    try { await Source.camera(); } catch (e) { /* message shown in panel */ }
+  });
+  el.flipBtn.addEventListener('click', async () => { try { await Source.camera(true); } catch (e) { /* shown */ } });
+  el.demoBtn.addEventListener('click', () => { if (Source.kind === 'demo') Source.stop(); else Source.demo(); });
+  el.tAttacks.addEventListener('click', () => { S.attacks = !S.attacks; saveSettings(); renderSetup(); });
+  el.tVoice.addEventListener('click', () => { S.voice = !S.voice; saveSettings(); renderSetup(); });
+  el.recalBtn.addEventListener('click', () => { recal = !recal; renderSetup(); });
+  el.startBtn.addEventListener('click', async () => {
+    Sound.unlock();
+    if (!(await ensureSource())) { setupTick(); return; }
+    newRace(); Wake.on(); show('race');
+  });
+  el.againBtn.addEventListener('click', async () => {
+    Sound.unlock();
+    if (!(await ensureSource())) { show('setup'); return; }
+    newRace(); Wake.on(); show('race');
+  });
+  el.setupBtn.addEventListener('click', () => { R.phase = 'idle'; show('setup'); });
+  el.rebaseBtn.addEventListener('click', () => {
+    if (!R.raw.length) return;
+    Base.set(R.mode, { v: median(R.raw), date: new Date().toISOString(), n: 1, fp: R.mode === 'row' ? engine.fingerprint() : null });
+    el.rebaseBtn.textContent = 'Saved as your baseline'; el.rebaseBtn.disabled = true;
+  });
+  // press and hold to end, so a stray tap mid-race can't stop it
+  let holdT = -1;
+  const holdStart = (e) => { e.preventDefault(); holdT = 0; };
+  const holdStop = () => { holdT = -1; el.endBtn.style.setProperty('--hold', '0%'); };
+  el.endBtn.addEventListener('pointerdown', holdStart);
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => el.endBtn.addEventListener(ev, holdStop));
+  el.endBtn.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && holdT < 0) holdStart(e); });
+  el.endBtn.addEventListener('keyup', holdStop);
+  function holdTick(dt) {
+    if (holdT < 0) return;
+    holdT += dt;
+    el.endBtn.style.setProperty('--hold', Math.min(100, holdT / 1.2 * 100).toFixed(0) + '%');
+    if (holdT >= 1.2) { holdStop(); if (R.phase !== 'idle' && R.phase !== 'done') finish(true); }
+  }
+  if (document.fullscreenEnabled || document.webkitFullscreenEnabled) {
+    el.fsBtn.hidden = false;
+    el.fsBtn.addEventListener('click', () => {
+      const d = document, de = d.documentElement;
+      try {
+        if (d.fullscreenElement || d.webkitFullscreenElement) (d.exitFullscreen || d.webkitExitFullscreen).call(d);
+        else (de.requestFullscreen || de.webkitRequestFullscreen).call(de);
+      } catch (e) { /* not allowed */ }
+    });
+  }
+  window.addEventListener('resize', () => { if (current === 'race') Scene.resize(); placeDock(); });
+  el.setup.addEventListener('scroll', placeDock, { passive: true });
+
+  let last = performance.now(), uiAcc = 0;
+  function frame(now) {
+    const dt = Math.min(0.1, Math.max(0, (now - last) / 1000)); last = now;
+    update(dt);
+    if (current === 'race') { Scene.draw(dt); hudTick(); }
+    else if (current === 'setup' && (uiAcc += dt) > 0.1) { uiAcc = 0; setupTick(); }
+    holdTick(dt);
+    requestAnimationFrame(frame);
+  }
+
+  renderSetup();
+  onSourceChange();
+  requestAnimationFrame(frame);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeDock);
+  // reopen the camera without a tap if permission was already granted
+  if (navigator.permissions && navigator.permissions.query) {
+    navigator.permissions.query({ name: 'camera' }).then((p) => { if (p.state === 'granted' && !Source.kind) Source.camera().catch(() => {}); }).catch(() => {});
+  }
+  if (params.get('demo') === '1') Source.demo();
+
+  // own service worker, scoped to this folder only, never the parent app's scope
+  if ('serviceWorker' in navigator && /\/erg-race\/(index\.html|erg-race\.html)?$/.test(location.pathname)) {
+    navigator.serviceWorker.register('erg-race-sw.js', { scope: './' }).catch(() => {});
+  }
+
+  window.__erg = { engine: () => engine, R, S, Source, setTimeScale: (k) => { timeScale = k; } };
+})();
+
+</script>
+</body>
+</html>
